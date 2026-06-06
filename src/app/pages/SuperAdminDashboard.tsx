@@ -7,6 +7,7 @@ import StatCard from '../components/StatCard';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import { Toaster, toast } from 'sonner';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
 
 const sidebarItems = [
   { icon: BarChart3, label: 'Dashboard', path: '/dashboard' },
@@ -26,6 +27,7 @@ const Dashboard = () => {
     monthlyStudents: 0
   });
   const [pendingApps, setPendingApps] = useState<any[]>([]);
+  const [viewApp, setViewApp] = useState<any>(null);
 
   const fetchDashboardData = async () => {
       try {
@@ -174,6 +176,44 @@ const Dashboard = () => {
           </table>
         </div>
       </Card>
+
+      <Dialog open={!!viewApp} onOpenChange={(open) => !open && setViewApp(null)}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Vendor Application Details</DialogTitle>
+          </DialogHeader>
+          {viewApp && (
+            <div className="space-y-6 mt-4">
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <p><strong>Name:</strong> {viewApp.name}</p>
+                <p><strong>Email:</strong> {viewApp.email}</p>
+                <p><strong>Phone:</strong> {viewApp.phone}</p>
+                <p><strong>Address:</strong> {viewApp.address}, {viewApp.city}, {viewApp.state} - {viewApp.pincode}</p>
+                <p><strong>Aadhaar Number:</strong> {viewApp.aadhaar_number}</p>
+                <p><strong>PAN Number:</strong> {viewApp.pan_number}</p>
+              </div>
+              
+              <div>
+                <h4 className="font-semibold mb-3">Identity Documents</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="border rounded p-2">
+                    <p className="text-xs text-center mb-2 font-medium">Aadhaar (Front)</p>
+                    <img src={viewApp.aadhaar_front} alt="Aadhaar Front" className="w-full h-auto object-contain rounded" />
+                  </div>
+                  <div className="border rounded p-2">
+                    <p className="text-xs text-center mb-2 font-medium">Aadhaar (Back)</p>
+                    <img src={viewApp.aadhaar_back} alt="Aadhaar Back" className="w-full h-auto object-contain rounded" />
+                  </div>
+                  <div className="border rounded p-2">
+                    <p className="text-xs text-center mb-2 font-medium">PAN Card</p>
+                    <img src={viewApp.pan_image} alt="PAN Card" className="w-full h-auto object-contain rounded" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

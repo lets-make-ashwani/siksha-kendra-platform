@@ -6,6 +6,8 @@ import Card from '../components/Card';
 
 export default function VendorRegistration() {
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -13,15 +15,49 @@ export default function VendorRegistration() {
     address: '',
     city: '',
     state: '',
-    pincode: ''
+    pincode: '',
+    aadhaar_number: '',
+    pan_number: '',
+    aadhaar_front: '',
+    aadhaar_back: '',
+    pan_image: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setError('');
+    setLoading(true);
+
+    try {
+      const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const apiUrl = rawApiUrl.replace(/\/$/, '');
+      
+      const response = await fetch(`${apiUrl}/api/auth/apply-vendor`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      const data = await response.json();
+      
+      if (!response.ok) throw new Error(data.message || 'Failed to submit application');
+      setSubmitted(true);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.type === 'file') {
+      const file = e.target.files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => setFormData({ ...formData, [e.target.name]: reader.result as string });
+        reader.readAsDataURL(file);
+      }
+      return;
+    }
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
@@ -112,6 +148,12 @@ export default function VendorRegistration() {
 
         <Card>
           <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="p-3 bg-destructive/10 text-destructive text-sm rounded-[8px]">
+                {error}
+              </div>
+            )}
+            
             <div>
               <h3 className="text-lg font-semibold text-foreground mb-4">Vendor Information</h3>
               <div className="space-y-4">
@@ -186,9 +228,59 @@ export default function VendorRegistration() {
               </div>
             </div>
 
+            <div>
+              <h3 className="text-lg font-semibold text-foreground mb-4">Identity Verification (Compulsory)</h3>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Input
+                    label="Aadhaar Card Number"
+                    name="aadhaar_number"
+                    value={formData.aadhaar_number}
+                    onChange={handleChange}
+                    required
+                    placeholder="1234 5678 9012"
+                  />
+                  <Input
+                    label="PAN Card Number"
+                    name="pan_number"
+                    value={formData.pan_number}
+                    onChange={handleChange}
+                    required
+                    placeholder="ABCDE1234F"
+                  />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-foreground">Aadhaar Front Photo</label>
+                    <input
+                      type="file" name="aadhaar_front" accept="image/*" required onChange={handleChange}
+                      className="w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-light file:text-primary hover:file:bg-primary/20"
+                    />
+                  </div>
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-foreground">Aadhaar Back Photo</label>
+                    <input
+                      type="file" name="aadhaar_back" accept="image/*" required onChange={handleChange}
+                      className="w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-light file:text-primary hover:file:bg-primary/20"
+                    />
+                  </div>
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-foreground">PAN Card Photo</label>
+                    <input
+                      type="file" name="pan_image" accept="image/*" required onChange={handleChange}
+                      className="w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-light file:text-primary hover:file:bg-primary/20"
+                    />
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  * Images must be clear and readable. Max size 5MB each.
+                </p>
+              </div>
+            </div>
+
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button type="submit" size="lg" className="flex-1">
-                Submit Application
+              <Button type="submit" size="lg" className="flex-1" disabled={loading}>
+                {loading ? 'Uploading & Submitting...' : 'Submit Application'}
               </Button>
               <Button type="button" variant="outline" size="lg" className="flex-1" onClick={() => window.history.back()}>
                 Cancel

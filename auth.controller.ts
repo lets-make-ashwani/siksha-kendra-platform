@@ -3,6 +3,13 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 import { prisma } from './index'; // or correct path to prisma instance
+import { v2 as cloudinary } from 'cloudinary';
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -17,6 +24,11 @@ const applicationSchema = z.object({
   city: z.string().min(2),
   state: z.string().min(2),
   pincode: z.string().min(4),
+  aadhaar_number: z.string().min(12, "Aadhaar must be at least 12 characters"),
+  pan_number: z.string().min(10, "PAN must be at least 10 characters"),
+  aadhaar_front: z.string().min(1, "Aadhaar front image is required"),
+  aadhaar_back: z.string().min(1, "Aadhaar back image is required"),
+  pan_image: z.string().min(1, "PAN image is required"),
 });
 
 export const login = async (req: Request, res: Response): Promise<any> => {
@@ -68,7 +80,18 @@ export const applyForVendor = async (req: Request, res: Response): Promise<any> 
       return res.status(400).json({ message: 'An application with this email already exists.' });
     }
 
-    await prisma.vendorApplication.create({ data });
+    // Upload images to Cloudinary
+    const uploadAadhaarFront = await cloudinary.uploader.upload(data.aadhaar_front, { folder: 'siksha_kendra/vendors' });
+    const uploadAadhaarBack = await cloudinary.uploader.upload(data.aadhaar_back, { folder: 'siksha_kendra/vendors' });
+    const uploadPan = await cloudinary.uploader.upload(data.pan_image, { folder: 'siksha_kendra/vendors' });
+
+    // Save application with the secure URLs
+    await prisma.vendorApplication.create({ data: { 
+      ...data, 
+      aadhaar_front: uploadAadhaarFront.secure_url,
+      aadhaar_back: uploadAadhaarBack.secure_url,
+      pan_image: uploadPan.secure_url
+    }});
     
     res.status(201).json({ message: 'Application submitted successfully. Awaiting admin approval.' });
   } catch (error: any) {

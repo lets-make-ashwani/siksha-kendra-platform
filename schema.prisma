@@ -56,6 +56,11 @@ model VendorApplication {
   city       String
   state      String
   pincode    String
+  aadhaar_number String
+  pan_number     String
+  aadhaar_front  String
+  aadhaar_back   String
+  pan_image      String
   status     ApplicationStatus @default(PENDING)
   created_at DateTime          @default(now())
   updated_at DateTime          @updatedAt
@@ -71,6 +76,11 @@ model Vendor {
   city           String?
   state          String?
   pincode        String?
+  aadhaar_number String?
+  pan_number     String?
+  aadhaar_front  String?
+  aadhaar_back   String?
+  pan_image      String?
   status         VendorStatus @default(ACTIVE)
   created_at     DateTime     @default(now())
   updated_at     DateTime     @updatedAt
