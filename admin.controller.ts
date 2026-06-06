@@ -64,6 +64,11 @@ export const inviteVendor = async (req: Request, res: Response): Promise<any> =>
             aadhaar_front: '',
             aadhaar_back: '',
             pan_image: '',
+            bank_name: '',
+            branch_name: '',
+            account_number: '',
+            ifsc_code: '',
+            passbook_image: '',
             status: 'ACTIVE',
           }
         }
@@ -151,6 +156,11 @@ export const approveApplication = async (req: Request, res: Response): Promise<a
             aadhaar_front: application.aadhaar_front,
             aadhaar_back: application.aadhaar_back,
             pan_image: application.pan_image,
+            bank_name: application.bank_name,
+            branch_name: application.branch_name,
+            account_number: application.account_number,
+            ifsc_code: application.ifsc_code,
+            passbook_image: application.passbook_image,
             status: 'ACTIVE'
           }
         }

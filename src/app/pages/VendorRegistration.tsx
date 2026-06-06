@@ -20,7 +20,12 @@ export default function VendorRegistration() {
     pan_number: '',
     aadhaar_front: '',
     aadhaar_back: '',
-    pan_image: ''
+    pan_image: '',
+    bank_name: '',
+    branch_name: '',
+    account_number: '',
+    ifsc_code: '',
+    passbook_image: ''
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -237,6 +242,8 @@ export default function VendorRegistration() {
                     onChange={handleChange}
                     required
                     placeholder="1234 5678 9012"
+                    maxLength={12}
+                    pattern="\d{12}"
                   />
                   <Input
                     label="PAN Card Number"
@@ -245,9 +252,11 @@ export default function VendorRegistration() {
                     onChange={handleChange}
                     required
                     placeholder="ABCDE1234F"
+                    maxLength={10}
+                    className="uppercase"
                   />
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
                   <div>
                     <label className="block mb-2 text-sm font-medium text-foreground">Aadhaar Front Photo</label>
                     <input
@@ -273,6 +282,55 @@ export default function VendorRegistration() {
                 <p className="text-xs text-muted-foreground mt-2">
                   * Images must be clear and readable. Max size 5MB each.
                 </p>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold text-foreground mb-4">Bank Account Details (Compulsory)</h3>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Input
+                    label="Bank Name"
+                    name="bank_name"
+                    value={formData.bank_name}
+                    onChange={handleChange}
+                    required
+                    placeholder="State Bank of India"
+                  />
+                  <Input
+                    label="Branch Name"
+                    name="branch_name"
+                    value={formData.branch_name}
+                    onChange={handleChange}
+                    required
+                    placeholder="Connaught Place"
+                  />
+                  <Input
+                    label="Account Number"
+                    name="account_number"
+                    value={formData.account_number}
+                    onChange={handleChange}
+                    required
+                    placeholder="123456789012"
+                  />
+                  <Input
+                    label="IFSC Code"
+                    name="ifsc_code"
+                    value={formData.ifsc_code}
+                    onChange={handleChange}
+                    required
+                    placeholder="SBIN0000001"
+                    maxLength={11}
+                    className="uppercase"
+                  />
+                </div>
+                <div className="mt-4">
+                  <label className="block mb-2 text-sm font-medium text-foreground">Bank Passbook / Cancelled Cheque Photo</label>
+                  <input
+                    type="file" name="passbook_image" accept="image/*" required onChange={handleChange}
+                    className="w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-light file:text-primary hover:file:bg-primary/20"
+                  />
+                </div>
               </div>
             </div>
 

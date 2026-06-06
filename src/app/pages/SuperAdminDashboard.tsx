@@ -190,11 +190,14 @@ const Dashboard = () => {
                 <p><strong>Address:</strong> {viewApp.address}, {viewApp.city}, {viewApp.state} - {viewApp.pincode}</p>
                 <p><strong>Aadhaar Number:</strong> {viewApp.aadhaar_number}</p>
                 <p><strong>PAN Number:</strong> {viewApp.pan_number}</p>
+                <p><strong>Bank:</strong> {viewApp.bank_name} ({viewApp.branch_name})</p>
+                <p><strong>Account No:</strong> {viewApp.account_number}</p>
+                <p><strong>IFSC:</strong> {viewApp.ifsc_code}</p>
               </div>
               
               <div>
-                <h4 className="font-semibold mb-3">Identity Documents</h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <h4 className="font-semibold mb-3">Uploaded Documents</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div className="border rounded p-2">
                     <p className="text-xs text-center mb-2 font-medium">Aadhaar (Front)</p>
                     <img src={viewApp.aadhaar_front} alt="Aadhaar Front" className="w-full h-auto object-contain rounded" />
@@ -206,6 +209,10 @@ const Dashboard = () => {
                   <div className="border rounded p-2">
                     <p className="text-xs text-center mb-2 font-medium">PAN Card</p>
                     <img src={viewApp.pan_image} alt="PAN Card" className="w-full h-auto object-contain rounded" />
+                  </div>
+                  <div className="border rounded p-2">
+                    <p className="text-xs text-center mb-2 font-medium">Bank Passbook</p>
+                    <img src={viewApp.passbook_image} alt="Passbook" className="w-full h-auto object-contain rounded" />
                   </div>
                 </div>
               </div>

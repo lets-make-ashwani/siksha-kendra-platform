@@ -24,11 +24,16 @@ const applicationSchema = z.object({
   city: z.string().min(2),
   state: z.string().min(2),
   pincode: z.string().min(4),
-  aadhaar_number: z.string().min(12, "Aadhaar must be at least 12 characters"),
-  pan_number: z.string().min(10, "PAN must be at least 10 characters"),
+  aadhaar_number: z.string().length(12, "Aadhaar must be exactly 12 digits"),
+  pan_number: z.string().length(10, "PAN must be exactly 10 characters"),
   aadhaar_front: z.string().min(1, "Aadhaar front image is required"),
   aadhaar_back: z.string().min(1, "Aadhaar back image is required"),
   pan_image: z.string().min(1, "PAN image is required"),
+  bank_name: z.string().min(2, "Bank name is required"),
+  branch_name: z.string().min(2, "Branch name is required"),
+  account_number: z.string().min(5, "Account number is required"),
+  ifsc_code: z.string().min(11, "IFSC code is required"),
+  passbook_image: z.string().min(1, "Passbook image is required"),
 });
 
 export const login = async (req: Request, res: Response): Promise<any> => {
@@ -84,13 +89,15 @@ export const applyForVendor = async (req: Request, res: Response): Promise<any> 
     const uploadAadhaarFront = await cloudinary.uploader.upload(data.aadhaar_front, { folder: 'siksha_kendra/vendors' });
     const uploadAadhaarBack = await cloudinary.uploader.upload(data.aadhaar_back, { folder: 'siksha_kendra/vendors' });
     const uploadPan = await cloudinary.uploader.upload(data.pan_image, { folder: 'siksha_kendra/vendors' });
+    const uploadPassbook = await cloudinary.uploader.upload(data.passbook_image, { folder: 'siksha_kendra/vendors' });
 
     // Save application with the secure URLs
     await prisma.vendorApplication.create({ data: { 
       ...data, 
       aadhaar_front: uploadAadhaarFront.secure_url,
       aadhaar_back: uploadAadhaarBack.secure_url,
-      pan_image: uploadPan.secure_url
+      pan_image: uploadPan.secure_url,
+      passbook_image: uploadPassbook.secure_url
     }});
     
     res.status(201).json({ message: 'Application submitted successfully. Awaiting admin approval.' });
