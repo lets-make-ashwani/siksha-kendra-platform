@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle, Clock } from 'lucide-react';
+import { CheckCircle, Clock, Upload } from 'lucide-react';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import Card from '../components/Card';
@@ -256,27 +256,63 @@ export default function VendorRegistration() {
                     className="uppercase"
                   />
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
-                  <div>
-                    <label className="block mb-2 text-sm font-medium text-foreground">Aadhaar Front Photo</label>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                  <div className="relative border-2 border-dashed border-border rounded-[12px] p-6 text-center hover:bg-muted/50 transition-colors">
                     <input
                       type="file" name="aadhaar_front" accept="image/*" required onChange={handleChange}
-                      className="w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-light file:text-primary hover:file:bg-primary/20"
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                     />
+                    <div className="pointer-events-none">
+                      {formData.aadhaar_front ? (
+                        <img src={formData.aadhaar_front} alt="Aadhaar Front" className="h-20 mx-auto object-contain rounded shadow-sm" />
+                      ) : (
+                        <>
+                          <div className="w-10 h-10 bg-primary-light rounded-full flex items-center justify-center mx-auto mb-3">
+                            <Upload className="w-5 h-5 text-primary" />
+                          </div>
+                          <span className="text-sm font-medium text-primary">Click to upload</span>
+                          <p className="text-xs text-muted-foreground mt-1">Aadhaar Front Photo</p>
+                        </>
+                      )}
+                    </div>
                   </div>
-                  <div>
-                    <label className="block mb-2 text-sm font-medium text-foreground">Aadhaar Back Photo</label>
+                  <div className="relative border-2 border-dashed border-border rounded-[12px] p-6 text-center hover:bg-muted/50 transition-colors">
                     <input
                       type="file" name="aadhaar_back" accept="image/*" required onChange={handleChange}
-                      className="w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-light file:text-primary hover:file:bg-primary/20"
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                     />
+                    <div className="pointer-events-none">
+                      {formData.aadhaar_back ? (
+                        <img src={formData.aadhaar_back} alt="Aadhaar Back" className="h-20 mx-auto object-contain rounded shadow-sm" />
+                      ) : (
+                        <>
+                          <div className="w-10 h-10 bg-primary-light rounded-full flex items-center justify-center mx-auto mb-3">
+                            <Upload className="w-5 h-5 text-primary" />
+                          </div>
+                          <span className="text-sm font-medium text-primary">Click to upload</span>
+                          <p className="text-xs text-muted-foreground mt-1">Aadhaar Back Photo</p>
+                        </>
+                      )}
+                    </div>
                   </div>
-                  <div>
-                    <label className="block mb-2 text-sm font-medium text-foreground">PAN Card Photo</label>
+                  <div className="relative border-2 border-dashed border-border rounded-[12px] p-6 text-center hover:bg-muted/50 transition-colors">
                     <input
                       type="file" name="pan_image" accept="image/*" required onChange={handleChange}
-                      className="w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-light file:text-primary hover:file:bg-primary/20"
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                     />
+                    <div className="pointer-events-none">
+                      {formData.pan_image ? (
+                        <img src={formData.pan_image} alt="PAN Card" className="h-20 mx-auto object-contain rounded shadow-sm" />
+                      ) : (
+                        <>
+                          <div className="w-10 h-10 bg-primary-light rounded-full flex items-center justify-center mx-auto mb-3">
+                            <Upload className="w-5 h-5 text-primary" />
+                          </div>
+                          <span className="text-sm font-medium text-primary">Click to upload</span>
+                          <p className="text-xs text-muted-foreground mt-1">PAN Card Photo</p>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
@@ -326,10 +362,25 @@ export default function VendorRegistration() {
                 </div>
                 <div className="mt-4">
                   <label className="block mb-2 text-sm font-medium text-foreground">Bank Passbook / Cancelled Cheque Photo</label>
-                  <input
-                    type="file" name="passbook_image" accept="image/*" required onChange={handleChange}
-                    className="w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-light file:text-primary hover:file:bg-primary/20"
-                  />
+                  <div className="relative border-2 border-dashed border-border rounded-[12px] p-6 text-center hover:bg-muted/50 transition-colors mt-2">
+                    <input
+                      type="file" name="passbook_image" accept="image/*" required onChange={handleChange}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    />
+                    <div className="pointer-events-none">
+                      {formData.passbook_image ? (
+                        <img src={formData.passbook_image} alt="Bank Passbook" className="h-20 mx-auto object-contain rounded shadow-sm" />
+                      ) : (
+                        <>
+                          <div className="w-10 h-10 bg-primary-light rounded-full flex items-center justify-center mx-auto mb-3">
+                            <Upload className="w-5 h-5 text-primary" />
+                          </div>
+                          <span className="text-sm font-medium text-primary">Click to upload</span>
+                          <p className="text-xs text-muted-foreground mt-1">Passbook / Cancelled Cheque Photo</p>
+                        </>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

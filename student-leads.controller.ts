@@ -33,7 +33,8 @@ export const submitLead = async (req: AuthRequest, res: Response): Promise<any> 
 
     res.status(201).json({ message: 'Enrollment submitted successfully.', leadId: lead.id });
   } catch (error: any) {
-    res.status(400).json({ message: error.errors || error.message });
+    const errorMsg = error.errors ? error.errors.map((e: any) => e.message).join(', ') : error.message;
+    res.status(400).json({ message: errorMsg });
   }
 };
 

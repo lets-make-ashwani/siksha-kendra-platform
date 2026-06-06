@@ -72,7 +72,8 @@ export const login = async (req: Request, res: Response): Promise<any> => {
     const { password: _, ...userWithoutPassword } = user;
     res.json({ token, user: userWithoutPassword });
   } catch (error: any) {
-    res.status(400).json({ message: error.errors || error.message });
+    const errorMsg = error.errors ? error.errors.map((e: any) => e.message).join(', ') : error.message;
+    res.status(400).json({ message: errorMsg });
   }
 };
 
@@ -102,6 +103,7 @@ export const applyForVendor = async (req: Request, res: Response): Promise<any> 
     
     res.status(201).json({ message: 'Application submitted successfully. Awaiting admin approval.' });
   } catch (error: any) {
-    res.status(400).json({ message: error.errors || error.message });
+    const errorMsg = error.errors ? error.errors.map((e: any) => e.message).join(', ') : error.message;
+    res.status(400).json({ message: errorMsg });
   }
 };
