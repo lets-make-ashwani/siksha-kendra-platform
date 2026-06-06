@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { GraduationCap, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import Card from '../components/Card';
@@ -57,10 +57,8 @@ export default function Login() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="w-14 h-14 bg-primary rounded-[12px] flex items-center justify-center">
-              <GraduationCap className="w-8 h-8 text-primary-foreground" />
-            </div>
-            <span className="text-3xl font-bold text-foreground">Siksha Kendra</span>
+            <img src="/TKS.png" alt="Topper's Siksha Kendra Logo" className="w-14 h-14 object-contain" />
+            <span className="text-3xl font-bold text-foreground">Topper's Siksha Kendra</span>
           </div>
           <h1 className="text-2xl font-bold text-foreground mb-2">Welcome Back!</h1>
           <p className="text-muted-foreground">Sign in to continue your learning journey</p>

@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { GraduationCap, Mail, Phone, MapPin } from 'lucide-react';
+import { Mail, Phone, MapPin } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -8,10 +8,8 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 bg-primary rounded-[12px] flex items-center justify-center">
-                <GraduationCap className="w-6 h-6 text-primary-foreground" />
-              </div>
-              <span className="text-xl font-bold">Siksha Kendra</span>
+              <img src="/TKS.png" alt="Topper's Siksha Kendra Logo" className="w-10 h-10 object-contain" />
+              <span className="text-xl font-bold">Topper's Siksha Kendra</span>
             </div>
             <p className="text-secondary-foreground/80">
               Empowering students through smart learning with trusted educational partners.
@@ -41,7 +39,7 @@ export default function Footer() {
             <ul className="space-y-3">
               <li className="flex items-center gap-2 text-secondary-foreground/80">
                 <Mail className="w-4 h-4" />
-                <span>support@sikshakendra.com</span>
+                <span>support@topperssikshakendra.com</span>
               </li>
               <li className="flex items-center gap-2 text-secondary-foreground/80">
                 <Phone className="w-4 h-4" />
@@ -56,7 +54,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-8 pt-8 border-t border-secondary-foreground/20 text-center text-secondary-foreground/80">
-          <p>&copy; 2026 Siksha Kendra. All rights reserved.</p>
+          <p>&copy; 2026 Topper's Siksha Kendra. All rights reserved.</p>
         </div>
       </div>
     </footer>

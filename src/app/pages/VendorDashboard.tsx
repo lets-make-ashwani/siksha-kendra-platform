@@ -1,6 +1,6 @@
-import { Routes, Route, Navigate } from 'react-router';
+import { Routes, Route, Navigate, useNavigate } from 'react-router';
 import { useState, useEffect } from 'react';
-import { BarChart3, Users, UserCheck, Clock, UserCircle, Settings, Copy, Share2, QrCode } from 'lucide-react';
+import { BarChart3, Users, UserCheck, Clock, UserCircle, Settings, Copy, Share2, QrCode, LogOut } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import Sidebar from '../components/Sidebar';
 import StatCard from '../components/StatCard';
@@ -13,7 +13,7 @@ const sidebarItems = [
   { icon: BarChart3, label: 'Dashboard', path: '/dashboard' },
   { icon: Users, label: 'Student List', path: '/students' },
   { icon: UserCircle, label: 'Profile', path: '/profile' },
-  { icon: Settings, label: 'Settings', path: '/settings' }
+  { icon: LogOut, label: 'Logout', path: '/logout' }
 ];
 
 const Dashboard = () => {
@@ -66,12 +66,12 @@ const Dashboard = () => {
   };
 
   const shareOnWhatsApp = () => {
-    const message = encodeURIComponent(`Join Siksha Kendra through my referral link: ${referralLink}`);
+    const message = encodeURIComponent(`Join Topper's Siksha Kendra through my referral link: ${referralLink}`);
     window.open(`https://wa.me/?text=${message}`, '_blank');
   };
 
   const shareOnTelegram = () => {
-    const message = encodeURIComponent(`Join Siksha Kendra through my referral link: ${referralLink}`);
+    const message = encodeURIComponent(`Join Topper's Siksha Kendra through my referral link: ${referralLink}`);
     window.open(`https://t.me/share/url?url=${referralLink}&text=${message}`, '_blank');
   };
 
@@ -334,6 +334,15 @@ const Profile = () => (
   </div>
 );
 
+const Logout = () => {
+  const navigate = useNavigate();
+  useEffect(() => {
+    localStorage.removeItem('token');
+    navigate('/login');
+  }, [navigate]);
+  return null;
+};
+
 export default function VendorDashboard() {
   return (
     <div className="flex min-h-screen bg-background">
@@ -344,7 +353,7 @@ export default function VendorDashboard() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/students" element={<StudentList />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/settings" element={<div className="p-6"><h1 className="text-3xl font-bold">Settings</h1></div>} />
+          <Route path="/logout" element={<Logout />} />
         </Routes>
       </main>
     </div>

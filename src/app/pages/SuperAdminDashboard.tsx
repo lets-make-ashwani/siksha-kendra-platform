@@ -1,6 +1,6 @@
-import { Routes, Route, Navigate } from 'react-router';
+import { Routes, Route, Navigate, useNavigate } from 'react-router';
 import { useState, useEffect } from 'react';
-import { Users, BookOpen, UserCheck, Bell, BarChart3, Settings, UserCircle, GraduationCap, CheckCircle, XCircle, Eye } from 'lucide-react';
+import { Users, BookOpen, UserCheck, Bell, BarChart3, Settings, UserCircle, GraduationCap, CheckCircle, XCircle, Eye, LogOut } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import Sidebar from '../components/Sidebar';
 import StatCard from '../components/StatCard';
@@ -15,9 +15,7 @@ const sidebarItems = [
   { icon: Users, label: 'Vendor Management', path: '/vendors' },
   { icon: UserCheck, label: 'Student Management', path: '/students' },
   { icon: BookOpen, label: 'Courses', path: '/courses' },
-  { icon: Bell, label: 'Notifications', path: '/notifications' },
-  { icon: Settings, label: 'Settings', path: '/settings' },
-  { icon: UserCircle, label: 'Profile', path: '/profile' }
+  { icon: LogOut, label: 'Logout', path: '/logout' }
 ];
 
 const Dashboard = () => {
@@ -90,7 +88,7 @@ const Dashboard = () => {
     <div className="p-6">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-foreground mb-2">Super Admin Dashboard</h1>
-        <p className="text-muted-foreground">Welcome back! Here's what's happening with Siksha Kendra today.</p>
+        <p className="text-muted-foreground">Welcome back! Here's what's happening with Topper's Siksha Kendra today.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -143,30 +141,30 @@ const Dashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {[
-                { name: 'Rajesh Kumar', email: 'rajesh@example.com', phone: '+91 98765 43210', city: 'Delhi', status: 'Pending' },
-                { name: 'Priya Sharma', email: 'priya@example.com', phone: '+91 98765 43211', city: 'Mumbai', status: 'Pending' },
-                { name: 'Amit Patel', email: 'amit@example.com', phone: '+91 98765 43212', city: 'Ahmedabad', status: 'Pending' }
-              ].map((vendor, idx) => (
-                <tr key={idx} className="border-b border-border">
+              {pendingApps.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-8 text-center text-muted-foreground">No pending vendor applications.</td>
+                </tr>
+              ) : pendingApps.map((vendor: any) => (
+                <tr key={vendor.id} className="border-b border-border hover:bg-muted/50 transition-colors">
                   <td className="py-3 px-4 text-foreground">{vendor.name}</td>
                   <td className="py-3 px-4 text-muted-foreground">{vendor.email}</td>
                   <td className="py-3 px-4 text-muted-foreground">{vendor.phone}</td>
                   <td className="py-3 px-4 text-muted-foreground">{vendor.city}</td>
                   <td className="py-3 px-4">
                     <span className="px-3 py-1 bg-warning/20 text-warning rounded-[8px] text-sm font-semibold">
-                      {vendor.status}
+                      Pending
                     </span>
                   </td>
                   <td className="py-3 px-4">
                     <div className="flex gap-2">
-                      <button className="p-2 hover:bg-primary-light rounded-[8px] transition-colors" title="Approve">
+                      <button onClick={() => handleAction(vendor.id, 'approve')} className="p-2 hover:bg-success/20 rounded-[8px] transition-colors" title="Approve">
                         <CheckCircle className="w-4 h-4 text-success" />
                       </button>
-                      <button className="p-2 hover:bg-destructive/10 rounded-[8px] transition-colors" title="Reject">
+                      <button onClick={() => handleAction(vendor.id, 'reject')} className="p-2 hover:bg-destructive/20 rounded-[8px] transition-colors" title="Reject">
                         <XCircle className="w-4 h-4 text-destructive" />
                       </button>
-                      <button className="p-2 hover:bg-primary-light rounded-[8px] transition-colors" title="View">
+                      <button onClick={() => setViewApp(vendor)} className="p-2 hover:bg-primary-light rounded-[8px] transition-colors" title="View">
                         <Eye className="w-4 h-4 text-primary" />
                       </button>
                     </div>
@@ -451,6 +449,155 @@ const StudentManagement = () => {
   </div>
 )};
 
+const CourseManagement = () => {
+  const [courses, setCourses] = useState<any[]>([]);
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    title: '', slug: '', description: '', price: 0, category: '', status: 'ACTIVE'
+  });
+
+  const fetchCourses = async () => {
+    try {
+      const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const apiUrl = rawApiUrl.replace(/\/$/, '');
+      const response = await fetch(`${apiUrl}/api/courses`);
+      if (response.ok) setCourses(await response.json());
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+    }
+  };
+
+  useEffect(() => { fetchCourses(); }, []);
+
+  const handleAddSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const apiUrl = rawApiUrl.replace(/\/$/, '');
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch(`${apiUrl}/api/courses`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({...formData, price: Number(formData.price)})
+      });
+      
+      if (response.ok) {
+        toast.success('Course added successfully!');
+        setIsAddOpen(false);
+        setFormData({ title: '', slug: '', description: '', price: 0, category: '', status: 'ACTIVE' });
+        fetchCourses();
+      } else {
+        const data = await response.json();
+        toast.error(data.message || 'Failed to add course');
+      }
+    } catch (error) {
+      toast.error('An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this course?')) return;
+    try {
+      const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const apiUrl = rawApiUrl.replace(/\/$/, '');
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${apiUrl}/api/courses/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        toast.success('Course deleted');
+        fetchCourses();
+      } else {
+        toast.error('Failed to delete course');
+      }
+    } catch (err) {
+      toast.error('Error deleting course');
+    }
+  };
+
+  return (
+    <div className="p-6">
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-3xl font-bold text-foreground">Courses Management</h1>
+        <Button onClick={() => setIsAddOpen(true)}>Add Course</Button>
+      </div>
+
+      <Card>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-border">
+                <th className="text-left py-3 px-4 text-sm font-semibold text-foreground">Title</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-foreground">Category</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-foreground">Price</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-foreground">Status</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-foreground">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {courses.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="py-8 text-center text-muted-foreground">No courses found.</td>
+                  </tr>
+              ) : courses.map((course) => (
+                <tr key={course.id} className="border-b border-border hover:bg-muted/50 transition-colors">
+                  <td className="py-3 px-4 text-foreground">{course.title}</td>
+                  <td className="py-3 px-4 text-muted-foreground">{course.category}</td>
+                  <td className="py-3 px-4 text-foreground">₹{course.price}</td>
+                  <td className="py-3 px-4">
+                    <span className={`px-3 py-1 rounded-[8px] text-sm font-semibold ${course.status === 'ACTIVE' ? 'bg-success/20 text-success' : 'bg-warning/20 text-warning'}`}>
+                      {course.status}
+                    </span>
+                  </td>
+                  <td className="py-3 px-4">
+                    <Button size="sm" variant="danger" onClick={() => handleDelete(course.id)}>Delete</Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+
+      <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle>Add New Course</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleAddSubmit} className="space-y-4 mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input label="Title" name="title" value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} required />
+              <Input label="Slug" name="slug" value={formData.slug} onChange={(e) => setFormData({...formData, slug: e.target.value})} required placeholder="e.g., math-10" />
+              <Input label="Category" name="category" value={formData.category} onChange={(e) => setFormData({...formData, category: e.target.value})} required />
+              <Input label="Price (₹)" type="number" name="price" value={formData.price as any} onChange={(e) => setFormData({...formData, price: Number(e.target.value)})} required min={0} />
+            </div>
+            <Input label="Description" name="description" value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} />
+            <div className="flex justify-end gap-2 mt-4">
+              <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>Cancel</Button>
+              <Button type="submit" disabled={loading}>{loading ? 'Adding...' : 'Add Course'}</Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+const Logout = () => {
+  const navigate = useNavigate();
+  useEffect(() => {
+    localStorage.removeItem('token');
+    navigate('/login');
+  }, [navigate]);
+  return null;
+};
+
 export default function SuperAdminDashboard() {
   return (
     <div className="flex min-h-screen bg-background">
@@ -462,10 +609,8 @@ export default function SuperAdminDashboard() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/vendors" element={<VendorManagement />} />
           <Route path="/students" element={<StudentManagement />} />
-          <Route path="/courses" element={<div className="p-6"><h1 className="text-3xl font-bold">Courses</h1></div>} />
-          <Route path="/notifications" element={<div className="p-6"><h1 className="text-3xl font-bold">Notifications</h1></div>} />
-          <Route path="/settings" element={<div className="p-6"><h1 className="text-3xl font-bold">Settings</h1></div>} />
-          <Route path="/profile" element={<div className="p-6"><h1 className="text-3xl font-bold">Profile</h1></div>} />
+          <Route path="/courses" element={<CourseManagement />} />
+          <Route path="/logout" element={<Logout />} />
         </Routes>
       </main>
     </div>

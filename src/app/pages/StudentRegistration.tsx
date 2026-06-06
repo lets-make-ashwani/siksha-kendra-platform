@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams } from 'react-router';
-import { CheckCircle, GraduationCap } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import Card from '../components/Card';
@@ -41,7 +41,7 @@ export default function StudentRegistration() {
           </div>
           <h1 className="text-3xl font-bold text-foreground mb-4">Registration Successful!</h1>
           <p className="text-muted-foreground mb-6">
-            Thank you for registering with Siksha Kendra. We have received your application and will contact you shortly.
+            Thank you for registering with Topper's Siksha Kendra. We have received your application and will contact you shortly.
           </p>
           <div className="bg-primary-light p-4 rounded-[12px] mb-6">
             <p className="text-sm text-muted-foreground mb-1">Your Referral Code</p>
@@ -58,10 +58,8 @@ export default function StudentRegistration() {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="w-12 h-12 bg-primary rounded-[12px] flex items-center justify-center">
-              <GraduationCap className="w-7 h-7 text-primary-foreground" />
-            </div>
-            <span className="text-2xl font-bold text-foreground">Siksha Kendra</span>
+            <img src="/TKS.png" alt="Topper's Siksha Kendra Logo" className="w-12 h-12 object-contain" />
+            <span className="text-2xl font-bold text-foreground">Topper's Siksha Kendra</span>
           </div>
           <h1 className="text-4xl font-bold text-foreground mb-3">Student Registration</h1>
           <p className="text-lg text-muted-foreground">Join thousands of students on their learning journey</p>

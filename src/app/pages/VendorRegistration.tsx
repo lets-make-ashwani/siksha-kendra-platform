@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle, Clock, GraduationCap } from 'lucide-react';
+import { CheckCircle, Clock } from 'lucide-react';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import Card from '../components/Card';
@@ -73,7 +73,7 @@ export default function VendorRegistration() {
           </div>
           <h1 className="text-3xl font-bold text-foreground mb-4">Application Submitted!</h1>
           <p className="text-muted-foreground mb-6">
-            Thank you for your interest in becoming a Siksha Kendra vendor. Your application is currently under review.
+            Thank you for your interest in becoming a Topper's Siksha Kendra vendor. Your application is currently under review.
           </p>
           <div className="bg-primary-light p-6 rounded-[12px] mb-6">
             <h3 className="font-semibold text-foreground mb-3">What's Next?</h3>
@@ -103,12 +103,10 @@ export default function VendorRegistration() {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="w-12 h-12 bg-primary rounded-[12px] flex items-center justify-center">
-              <GraduationCap className="w-7 h-7 text-primary-foreground" />
-            </div>
-            <span className="text-2xl font-bold text-foreground">Siksha Kendra</span>
+            <img src="/TKS.png" alt="Topper's Siksha Kendra Logo" className="w-12 h-12 object-contain" />
+            <span className="text-2xl font-bold text-foreground">Topper's Siksha Kendra</span>
           </div>
-          <h1 className="text-4xl font-bold text-foreground mb-3">Become a Siksha Kendra Vendor</h1>
+          <h1 className="text-4xl font-bold text-foreground mb-3">Become a Topper's Siksha Kendra Vendor</h1>
           <p className="text-lg text-muted-foreground">Join our network of trusted educational partners</p>
         </div>
 

@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { GraduationCap, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import Button from './Button';
 
@@ -11,10 +11,8 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-primary rounded-[12px] flex items-center justify-center">
-              <GraduationCap className="w-6 h-6 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold text-foreground">Siksha Kendra</span>
+            <img src="/TKS.png" alt="Topper's Siksha Kendra Logo" className="w-10 h-10 object-contain" />
+            <span className="text-xl font-bold text-foreground">Topper's Siksha Kendra</span>
           </Link>
 
           <div className="hidden md:flex items-center gap-6">

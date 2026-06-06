@@ -136,7 +136,7 @@ export default function LandingPage() {
           <div className="text-center mb-12">
             <p className="text-primary font-semibold mb-2">WHY CHOOSE US</p>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-              Why Choose Siksha Kendra
+              Why Choose Topper's Siksha Kendra
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -202,7 +202,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Become a Siksha Kendra Vendor
+                Become a Topper's Siksha Kendra Vendor
               </h2>
               <p className="text-lg mb-6 text-primary-foreground/90">
                 Join our network of trusted educational partners and grow your student base with our referral system.
@@ -264,7 +264,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               { name: 'Rahul Sharma', role: 'JEE Student', text: 'The courses are excellent and the teachers are very supportive. I cleared JEE Advanced with a great rank!' },
-              { name: 'Priya Patel', role: 'NEET Student', text: 'Siksha Kendra helped me achieve my dream of becoming a doctor. The study material and tests were top-notch.' },
+              { name: 'Priya Patel', role: 'NEET Student', text: 'Topper\'s Siksha Kendra helped me achieve my dream of becoming a doctor. The study material and tests were top-notch.' },
               { name: 'Amit Kumar', role: 'CBSE Student', text: 'I improved my grades significantly with the help of amazing teachers and comprehensive content.' }
             ].map((testimonial, idx) => (
               <Card key={idx}>
@@ -319,7 +319,7 @@ export default function LandingPage() {
             Ready to Start Your Learning Journey?
           </h2>
           <p className="text-lg text-muted-foreground mb-8">
-            Join thousands of students who are achieving their academic goals with Siksha Kendra.
+            Join thousands of students who are achieving their academic goals with Topper's Siksha Kendra.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link to="/courses">
