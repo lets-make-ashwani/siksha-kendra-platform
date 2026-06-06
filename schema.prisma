@@ -1,5 +1,5 @@
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
@@ -31,7 +31,7 @@ enum CourseStatus {
 }
 
 model User {
-  id             String         @id @default(uuid())
+  id             String         @id @default(auto()) @map("_id") @db.ObjectId
   uuid           String         @unique @default(uuid())
   name           String
   email          String         @unique
@@ -48,7 +48,7 @@ model User {
 }
 
 model VendorApplication {
-  id         String            @id @default(uuid())
+  id         String            @id @default(auto()) @map("_id") @db.ObjectId
   name       String
   email      String            @unique
   phone      String
@@ -62,10 +62,10 @@ model VendorApplication {
 }
 
 model Vendor {
-  id             String       @id @default(uuid())
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
   vendor_id      String       @unique // e.g., VND000001
   referral_code  String       @unique // e.g., SKR8Y4T2P9
-  user_id        String       @unique
+  user_id        String       @unique @db.ObjectId
   user           User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
   address        String?
   city           String?
@@ -80,16 +80,16 @@ model Vendor {
 }
 
 model Referral {
-  id         String   @id @default(uuid())
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
   code       String   @unique
-  vendor_id  String
+  vendor_id  String   @db.ObjectId
   vendor     Vendor   @relation(fields: [vendor_id], references: [id], onDelete: Cascade)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 }
 
 model Course {
-  id          String       @id @default(uuid())
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
   title       String
   slug        String       @unique
   description String?
@@ -104,10 +104,10 @@ model Course {
 }
 
 model StudentLead {
-  id              String   @id @default(uuid())
-  vendor_id       String?
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  vendor_id       String?  @db.ObjectId
   vendor          Vendor?  @relation(fields: [vendor_id], references: [id], onDelete: SetNull)
-  course_id       String
+  course_id       String   @db.ObjectId
   course          Course   @relation(fields: [course_id], references: [id], onDelete: Cascade)
   name            String
   phone           String
@@ -123,8 +123,8 @@ model StudentLead {
 }
 
 model Notification {
-  id         String   @id @default(uuid())
-  user_id    String
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  user_id    String   @db.ObjectId
   user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   title      String
   message    String
@@ -133,8 +133,8 @@ model Notification {
 }
 
 model ActivityLog {
-  id          String   @id @default(uuid())
-  user_id     String?
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  user_id     String?  @db.ObjectId
   user        User?    @relation(fields: [user_id], references: [id], onDelete: SetNull)
   action      String
   entity_type String?
@@ -144,7 +144,7 @@ model ActivityLog {
 }
 
 model Setting {
-  id         String   @id @default(uuid())
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
   key        String   @unique
   value      String
   updated_at DateTime @updatedAt

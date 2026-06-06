@@ -7,7 +7,8 @@
     "build": "vite build",
     "dev:frontend": "vite",
     "dev:backend": "nodemon --exec npx tsx index.ts",
-    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\""
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "start": "tsx index.ts"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
