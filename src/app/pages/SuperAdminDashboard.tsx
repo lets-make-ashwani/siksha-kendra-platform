@@ -6,6 +6,7 @@ import Sidebar from '../components/Sidebar';
 import StatCard from '../components/StatCard';
 import Card from '../components/Card';
 import Button from '../components/Button';
+import Input from '../components/Input';
 import { Toaster, toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
 
@@ -220,9 +221,14 @@ const Dashboard = () => {
 
 const VendorManagement = () => {
   const [vendors, setVendors] = useState<any[]>([]);
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [newVendorCreds, setNewVendorCreds] = useState<any>(null);
+  const [formData, setFormData] = useState({
+    name: '', email: '', phone: '', address: '', city: '', state: '', pincode: ''
+  });
 
-  useEffect(() => {
-    const fetchVendors = async () => {
+  const fetchVendors = async () => {
       try {
         const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
         const apiUrl = rawApiUrl.replace(/\/$/, '');
@@ -236,15 +242,58 @@ const VendorManagement = () => {
       } catch (error) {
         console.error("Error fetching vendors:", error);
       }
-    };
+  };
+
+  useEffect(() => {
     fetchVendors();
   }, []);
+
+  const handleAddSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const apiUrl = rawApiUrl.replace(/\/$/, '');
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch(`${apiUrl}/api/admin/vendors/invite`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(formData)
+      });
+      
+      const data = await response.json();
+      if (response.ok) {
+        toast.success('Vendor added successfully!');
+        setNewVendorCreds(data.credentials);
+        setIsAddOpen(false);
+        setFormData({ name: '', email: '', phone: '', address: '', city: '', state: '', pincode: '' });
+        fetchVendors(); // Refresh the table
+      } else {
+        toast.error(data.message || 'Failed to add vendor');
+      }
+    } catch (error) {
+      toast.error('An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success('Copied to clipboard!');
+  };
 
   return (
   <div className="p-6">
     <div className="mb-6 flex items-center justify-between">
       <h1 className="text-3xl font-bold text-foreground">Vendor Management</h1>
-      <Button>Add Vendor</Button>
+      <div className="flex gap-3">
+        <Button variant="outline" onClick={() => copyToClipboard(`${window.location.origin}/become-vendor`)}>
+          Share Application Link
+        </Button>
+        <Button onClick={() => setIsAddOpen(true)}>Add Vendor Manually</Button>
+      </div>
     </div>
 
     <Card>
@@ -289,6 +338,47 @@ const VendorManagement = () => {
         </table>
       </div>
     </Card>
+
+    <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>Add New Vendor</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleAddSubmit} className="space-y-4 mt-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input label="Name" name="name" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} required />
+            <Input label="Email" type="email" name="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} required />
+            <Input label="Phone" name="phone" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} required />
+            <Input label="Address" name="address" value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})} required />
+            <Input label="City" name="city" value={formData.city} onChange={(e) => setFormData({...formData, city: e.target.value})} required />
+            <Input label="State" name="state" value={formData.state} onChange={(e) => setFormData({...formData, state: e.target.value})} required />
+            <Input label="Pincode" name="pincode" value={formData.pincode} onChange={(e) => setFormData({...formData, pincode: e.target.value})} required />
+          </div>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>Cancel</Button>
+            <Button type="submit" disabled={loading}>{loading ? 'Adding...' : 'Add Vendor'}</Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+
+    <Dialog open={!!newVendorCreds} onOpenChange={(open) => !open && setNewVendorCreds(null)}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Vendor Created Successfully!</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4 mt-4 text-sm">
+          <p className="text-muted-foreground">Share these credentials with the new vendor so they can log in.</p>
+          <div className="bg-muted p-4 rounded-[8px] space-y-2">
+            <p><strong>Email:</strong> {newVendorCreds?.email}</p>
+            <p><strong>Password:</strong> {newVendorCreds?.password}</p>
+          </div>
+          <Button className="w-full" onClick={() => copyToClipboard(newVendorCreds?.messageToForward || '')}>
+            Copy Message to Share
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   </div>
 )};
 
