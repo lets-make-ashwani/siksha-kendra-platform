@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router';
+import { useState, useEffect } from 'react';
 import { Users, BookOpen, UserCheck, Bell, BarChart3, Settings, UserCircle, GraduationCap, CheckCircle, XCircle, Eye } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import Sidebar from '../components/Sidebar';
@@ -17,6 +18,32 @@ const sidebarItems = [
 ];
 
 const Dashboard = () => {
+  const [stats, setStats] = useState({
+    totalVendors: 0,
+    pendingVendors: 0,
+    totalStudents: 0,
+    monthlyStudents: 0
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${apiUrl}/api/admin/stats`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setStats(data);
+        }
+      } catch (error) {
+        console.error("Error fetching admin stats:", error);
+      }
+    };
+    fetchStats();
+  }, []);
+
   const monthlyData = [
     { month: 'Jan', students: 400, vendors: 20 },
     { month: 'Feb', students: 550, vendors: 35 },
@@ -34,10 +61,10 @@ const Dashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <StatCard title="Total Vendors" value="524" icon={Users} trend="+12% this month" color="primary" />
-        <StatCard title="Total Students" value="50,234" icon={GraduationCap} trend="+18% this month" color="success" />
-        <StatCard title="Active Courses" value="1,089" icon={BookOpen} trend="+8% this month" color="warning" />
-        <StatCard title="Pending Requests" value="23" icon={Bell} color="secondary" />
+        <StatCard title="Total Vendors" value={stats.totalVendors} icon={Users} color="primary" />
+        <StatCard title="Total Students" value={stats.totalStudents} icon={GraduationCap} color="success" />
+        <StatCard title="Monthly Students" value={stats.monthlyStudents} icon={BookOpen} color="warning" />
+        <StatCard title="Pending Requests" value={stats.pendingVendors} icon={Bell} color="secondary" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">

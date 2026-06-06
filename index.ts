@@ -17,12 +17,15 @@ const app = express();
 export const prisma = new PrismaClient();
 const PORT = process.env.PORT || 5000;
 
+// Clean up FRONTEND_URL to ensure it doesn't have a trailing slash (which breaks CORS)
+const frontendUrl = process.env.FRONTEND_URL ? process.env.FRONTEND_URL.replace(/\/$/, '') : '';
+
 // Security and Utility Middleware
 app.use(helmet());
 app.use(cors({
   origin: [
     'http://localhost:5173', // Local development
-    process.env.FRONTEND_URL as string // Production Vercel URL
+    frontendUrl // Production Vercel URL (cleaned)
   ].filter(Boolean),
   credentials: true,
 }));

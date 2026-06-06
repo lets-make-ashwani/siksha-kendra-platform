@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import SuperAdminDashboard from './pages/SuperAdminDashboard';
 import VendorDashboard from './pages/VendorDashboard';
 import StudentDashboard from './pages/StudentDashboard';
+import ProtectedRoute from './components/ProtectedRoute';
 
 export default function App() {
   return (
@@ -21,8 +22,24 @@ export default function App() {
           <Route path="/enroll/:referralCode" element={<StudentRegistration />} />
           <Route path="/become-vendor" element={<VendorRegistration />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/admin/*" element={<SuperAdminDashboard />} />
-          <Route path="/vendor/*" element={<VendorDashboard />} />
+          
+          {/* Protected Dashboard Routes */}
+          <Route 
+            path="/admin/*" 
+            element={
+              <ProtectedRoute>
+                <SuperAdminDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/vendor/*" 
+            element={
+              <ProtectedRoute>
+                <VendorDashboard />
+              </ProtectedRoute>
+            } 
+          />
           <Route path="/student/*" element={<StudentDashboard />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
