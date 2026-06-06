@@ -9,7 +9,7 @@ import Login from './pages/Login';
 import SuperAdminDashboard from './pages/SuperAdminDashboard';
 import VendorDashboard from './pages/VendorDashboard';
 import StudentDashboard from './pages/StudentDashboard';
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute from './pages/ProtectedRoute';
 
 export default function App() {
   return (
