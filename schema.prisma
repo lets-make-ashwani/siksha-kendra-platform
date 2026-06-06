@@ -1,0 +1,151 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  SUPER_ADMIN
+  VENDOR
+}
+
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum VendorStatus {
+  ACTIVE
+  SUSPENDED
+  INACTIVE
+}
+
+enum CourseStatus {
+  ACTIVE
+  DRAFT
+  ARCHIVED
+}
+
+model User {
+  id             String         @id @default(uuid())
+  uuid           String         @unique @default(uuid())
+  name           String
+  email          String         @unique
+  phone          String?        @unique
+  password       String
+  role           Role
+  is_verified    Boolean        @default(false)
+  created_at     DateTime       @default(now())
+  updated_at     DateTime       @updatedAt
+
+  vendor         Vendor?
+  notifications  Notification[]
+  activityLogs   ActivityLog[]
+}
+
+model VendorApplication {
+  id         String            @id @default(uuid())
+  name       String
+  email      String            @unique
+  phone      String
+  address    String
+  city       String
+  state      String
+  pincode    String
+  status     ApplicationStatus @default(PENDING)
+  created_at DateTime          @default(now())
+  updated_at DateTime          @updatedAt
+}
+
+model Vendor {
+  id             String       @id @default(uuid())
+  vendor_id      String       @unique // e.g., VND000001
+  referral_code  String       @unique // e.g., SKR8Y4T2P9
+  user_id        String       @unique
+  user           User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  address        String?
+  city           String?
+  state          String?
+  pincode        String?
+  status         VendorStatus @default(ACTIVE)
+  created_at     DateTime     @default(now())
+  updated_at     DateTime     @updatedAt
+
+  referrals      Referral[]
+  studentLeads   StudentLead[]
+}
+
+model Referral {
+  id         String   @id @default(uuid())
+  code       String   @unique
+  vendor_id  String
+  vendor     Vendor   @relation(fields: [vendor_id], references: [id], onDelete: Cascade)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Course {
+  id          String       @id @default(uuid())
+  title       String
+  slug        String       @unique
+  description String?
+  thumbnail   String?
+  price       Float        @default(0)
+  category    String?
+  status      CourseStatus @default(ACTIVE)
+  created_at  DateTime     @default(now())
+  updated_at  DateTime     @updatedAt
+
+  studentLeads StudentLead[]
+}
+
+model StudentLead {
+  id              String   @id @default(uuid())
+  vendor_id       String?
+  vendor          Vendor?  @relation(fields: [vendor_id], references: [id], onDelete: SetNull)
+  course_id       String
+  course          Course   @relation(fields: [course_id], references: [id], onDelete: Cascade)
+  name            String
+  phone           String
+  email           String
+  address         String?
+  class           String?
+  school_name     String?
+  parent_name     String?
+  parent_phone    String?
+  submission_date DateTime @default(now())
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+}
+
+model Notification {
+  id         String   @id @default(uuid())
+  user_id    String
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  title      String
+  message    String
+  is_read    Boolean  @default(false)
+  created_at DateTime @default(now())
+}
+
+model ActivityLog {
+  id          String   @id @default(uuid())
+  user_id     String?
+  user        User?    @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  action      String
+  entity_type String?
+  entity_id   String?
+  details     String?  // JSON string
+  created_at  DateTime @default(now())
+}
+
+model Setting {
+  id         String   @id @default(uuid())
+  key        String   @unique
+  value      String
+  updated_at DateTime @updatedAt
+}

@@ -1,0 +1,55 @@
+import type { Request, Response } from 'express';
+import { z } from 'zod';
+import { prisma } from './index';
+
+const courseSchema = z.object({
+  title: z.string().min(2),
+  slug: z.string().min(2),
+  description: z.string().optional(),
+  price: z.number().min(0),
+  category: z.string().optional(),
+  status: z.enum(['ACTIVE', 'DRAFT', 'ARCHIVED']).optional()
+});
+
+export const getCourses = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const courses = await prisma.course.findMany({
+      where: { status: 'ACTIVE' },
+      orderBy: { created_at: 'desc' }
+    });
+    res.json(courses);
+  } catch (error: any) {
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+export const createCourse = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const data = courseSchema.parse(req.body);
+    const course = await prisma.course.create({ data });
+    res.status(201).json(course);
+  } catch (error: any) {
+    res.status(400).json({ message: error.errors || error.message });
+  }
+};
+
+export const updateCourse = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { id } = req.params;
+    const data = courseSchema.partial().parse(req.body);
+    const course = await prisma.course.update({ where: { id }, data });
+    res.json(course);
+  } catch (error: any) {
+    res.status(400).json({ message: error.errors || 'Course not found' });
+  }
+};
+
+export const deleteCourse = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { id } = req.params;
+    await prisma.course.delete({ where: { id } });
+    res.json({ message: 'Course deleted successfully' });
+  } catch (error: any) {
+    res.status(500).json({ message: 'Error deleting course' });
+  }
+};
