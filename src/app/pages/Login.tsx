@@ -9,22 +9,40 @@ export default function Login() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
-    password: '',
-    userType: 'student'
+    password: ''
   });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.userType === 'admin') {
-      navigate('/admin/dashboard');
-    } else if (formData.userType === 'vendor') {
-      navigate('/vendor/dashboard');
-    } else {
-      navigate('/student/dashboard');
+    setError('');
+    setLoading(true);
+    
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const response = await fetch(`${apiUrl}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      const data = await response.json();
+      
+      if (!response.ok) throw new Error(data.message || 'Login failed');
+      
+      localStorage.setItem('token', data.token);
+      
+      if (data.user.role === 'SUPER_ADMIN') navigate('/admin/dashboard');
+      else if (data.user.role === 'VENDOR') navigate('/vendor/dashboard');
+      else navigate('/');
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
@@ -47,19 +65,11 @@ export default function Login() {
 
         <Card>
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block mb-2 text-foreground">Login As</label>
-              <select
-                name="userType"
-                value={formData.userType}
-                onChange={handleChange}
-                className="w-full px-4 py-3 bg-input-background border border-input rounded-[12px] text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-              >
-                <option value="student">Student</option>
-                <option value="vendor">Vendor</option>
-                <option value="admin">Super Admin</option>
-              </select>
-            </div>
+            {error && (
+              <div className="p-3 bg-destructive/10 text-destructive text-sm rounded-[8px]">
+                {error}
+              </div>
+            )}
 
             <div className="relative">
               <Mail className="absolute left-4 top-[50px] -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -97,8 +107,8 @@ export default function Login() {
               <a href="#" className="text-primary hover:underline">Forgot Password?</a>
             </div>
 
-            <Button type="submit" size="lg" className="w-full">
-              Sign In
+            <Button type="submit" size="lg" className="w-full" disabled={loading}>
+              {loading ? 'Signing in...' : 'Sign In'}
             </Button>
           </form>
         </Card>
