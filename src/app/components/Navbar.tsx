@@ -12,16 +12,12 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="flex items-center gap-2">
             <img src="/TKS.png" alt="Topper's Siksha Kendra Logo" className="w-10 h-10 object-contain" />
-            <span className="text-xl font-bold text-foreground">Topper's Siksha Kendra</span>
+            <span className="text-xl font-bold text-foreground">
+              Topper<span className="text-primary">'s</span> Siksha <span className="text-primary">Kendra</span>
+            </span>
           </Link>
 
           <div className="hidden md:flex items-center gap-6">
-            <Link to="/courses" className="text-foreground hover:text-primary transition-colors">
-              Courses
-            </Link>
-            <Link to="/become-vendor" className="text-foreground hover:text-primary transition-colors">
-              Become a Vendor
-            </Link>
             <Link to="/login">
               <Button size="sm">Login</Button>
             </Link>
@@ -37,20 +33,6 @@ export default function Navbar() {
 
         {isOpen && (
           <div className="md:hidden py-4 space-y-4">
-            <Link
-              to="/courses"
-              className="block text-foreground hover:text-primary transition-colors"
-              onClick={() => setIsOpen(false)}
-            >
-              Courses
-            </Link>
-            <Link
-              to="/become-vendor"
-              className="block text-foreground hover:text-primary transition-colors"
-              onClick={() => setIsOpen(false)}
-            >
-              Become a Vendor
-            </Link>
             <Link to="/login" onClick={() => setIsOpen(false)}>
               <Button size="sm" className="w-full">Login</Button>
             </Link>

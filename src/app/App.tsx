@@ -8,7 +8,6 @@ import VendorRegistration from './pages/VendorRegistration';
 import Login from './pages/Login';
 import SuperAdminDashboard from './pages/SuperAdminDashboard';
 import VendorDashboard from './pages/VendorDashboard';
-import StudentDashboard from './pages/StudentDashboard';
 import ProtectedRoute from './pages/ProtectedRoute';
 
 export default function App() {
@@ -27,7 +26,7 @@ export default function App() {
           <Route 
             path="/admin/*" 
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['SUPER_ADMIN']}>
                 <SuperAdminDashboard />
               </ProtectedRoute>
             } 
@@ -35,12 +34,11 @@ export default function App() {
           <Route 
             path="/vendor/*" 
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['VENDOR']}>
                 <VendorDashboard />
               </ProtectedRoute>
             } 
           />
-          <Route path="/student/*" element={<StudentDashboard />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>

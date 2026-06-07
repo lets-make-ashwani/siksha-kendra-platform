@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
 import Card from '../components/Card';
+import { PopularCourses } from './PopularCourses';
 
 export default function LandingPage() {
   return (
@@ -23,9 +24,6 @@ export default function LandingPage() {
               <div className="flex flex-wrap gap-4">
                 <Link to="/courses">
                   <Button size="lg">Enroll Now</Button>
-                </Link>
-                <Link to="/become-vendor">
-                  <Button size="lg" variant="outline">Become a Vendor</Button>
                 </Link>
               </div>
             </div>
@@ -95,48 +93,14 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <p className="text-primary font-semibold mb-2">FEATURED COURSES</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-              Popular Courses
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { title: 'JEE Advanced Preparation', class: 'Class 11-12', price: '₹15,999', rating: 4.8 },
-              { title: 'NEET Complete Course', class: 'Class 11-12', price: '₹14,999', rating: 4.9 },
-              { title: 'CBSE Mathematics', class: 'Class 10', price: '₹8,999', rating: 4.7 }
-            ].map((course, idx) => (
-              <Card key={idx} hover>
-                <div className="aspect-video bg-gradient-to-br from-primary-light to-accent rounded-[12px] mb-4 flex items-center justify-center">
-                  <BookOpen className="w-16 h-16 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold text-foreground mb-2">{course.title}</h3>
-                <p className="text-muted-foreground mb-4">{course.class}</p>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-1">
-                    <Star className="w-4 h-4 fill-warning text-warning" />
-                    <span className="font-semibold">{course.rating}</span>
-                  </div>
-                  <span className="text-2xl font-bold text-primary">{course.price}</span>
-                </div>
-                <Link to={`/courses/${idx + 1}`}>
-                  <Button className="w-full">View Details</Button>
-                </Link>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+      <PopularCourses />
 
       <section className="py-16 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <p className="text-primary font-semibold mb-2">WHY CHOOSE US</p>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-              Why Choose Topper's Siksha Kendra
+              Why Choose Topper<span className="text-primary">'s</span> Siksha <span className="text-primary">Kendra</span>
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -197,62 +161,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-gradient-to-br from-primary to-primary-dark text-primary-foreground">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Become a Topper's Siksha Kendra Vendor
-              </h2>
-              <p className="text-lg mb-6 text-primary-foreground/90">
-                Join our network of trusted educational partners and grow your student base with our referral system.
-              </p>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5" />
-                  <span>Generate unlimited referrals</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5" />
-                  <span>Track your student enrollments</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5" />
-                  <span>Access vendor dashboard</span>
-                </li>
-              </ul>
-              <Link to="/become-vendor">
-                <Button variant="outline" size="lg" className="bg-white text-primary border-white hover:bg-white/90">
-                  Apply Now
-                </Button>
-              </Link>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-[24px] p-8">
-              <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                    <Users className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold">500+</p>
-                    <p className="text-primary-foreground/80">Active Vendors</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                    <TrendingUp className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold">10,000+</p>
-                    <p className="text-primary-foreground/80">Referrals Generated</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section className="py-16 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -301,8 +209,7 @@ export default function LandingPage() {
             {[
               { q: 'How do I enroll in a course?', a: 'You can enroll through our website or use a referral link from a vendor partner.' },
               { q: 'What is the refund policy?', a: 'We offer a 7-day money-back guarantee if you are not satisfied with the course.' },
-              { q: 'Are the classes live or recorded?', a: 'We offer both live interactive classes and recorded video lectures for flexibility.' },
-              { q: 'How can I become a vendor?', a: 'Click on "Become a Vendor" button and fill out the application form. Our team will review and approve it.' }
+              { q: 'Are the classes live or recorded?', a: 'We offer both live interactive classes and recorded video lectures for flexibility.' }
             ].map((faq, idx) => (
               <Card key={idx}>
                 <h4 className="font-semibold text-foreground mb-2">{faq.q}</h4>
@@ -319,14 +226,11 @@ export default function LandingPage() {
             Ready to Start Your Learning Journey?
           </h2>
           <p className="text-lg text-muted-foreground mb-8">
-            Join thousands of students who are achieving their academic goals with Topper's Siksha Kendra.
+            Join thousands of students who are achieving their academic goals with Topper<span className="text-primary">'s</span> Siksha <span className="text-primary">Kendra</span>.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link to="/courses">
               <Button size="lg">Browse Courses</Button>
-            </Link>
-            <Link to="/become-vendor">
-              <Button size="lg" variant="outline">Become a Partner</Button>
             </Link>
           </div>
         </div>

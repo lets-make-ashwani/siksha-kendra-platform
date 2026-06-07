@@ -338,6 +338,7 @@ const Logout = () => {
   const navigate = useNavigate();
   useEffect(() => {
     localStorage.removeItem('token');
+    localStorage.removeItem('role');
     navigate('/login');
   }, [navigate]);
   return null;

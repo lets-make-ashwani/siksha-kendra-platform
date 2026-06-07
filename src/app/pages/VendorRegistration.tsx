@@ -108,9 +108,13 @@ export default function VendorRegistration() {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
             <img src="/TKS.png" alt="Topper's Siksha Kendra Logo" className="w-12 h-12 object-contain" />
-            <span className="text-2xl font-bold text-foreground">Topper's Siksha Kendra</span>
+            <span className="text-2xl font-bold text-foreground">
+              Topper<span className="text-primary">'s</span> Siksha <span className="text-primary">Kendra</span>
+            </span>
           </div>
-          <h1 className="text-4xl font-bold text-foreground mb-3">Become a Topper's Siksha Kendra Vendor</h1>
+          <h1 className="text-4xl font-bold text-foreground mb-3">
+            Become a Topper<span className="text-primary">'s</span> Siksha <span className="text-primary">Kendra</span> Vendor
+          </h1>
           <p className="text-lg text-muted-foreground">Join our network of trusted educational partners</p>
         </div>
 

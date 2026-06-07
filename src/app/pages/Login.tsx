@@ -34,6 +34,7 @@ export default function Login() {
       if (!response.ok) throw new Error(data.message || 'Login failed');
       
       localStorage.setItem('token', data.token);
+      localStorage.setItem('role', data.user.role);
       
       if (data.user.role === 'SUPER_ADMIN') navigate('/admin/dashboard');
       else if (data.user.role === 'VENDOR') navigate('/vendor/dashboard');
@@ -58,7 +59,9 @@ export default function Login() {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
             <img src="/TKS.png" alt="Topper's Siksha Kendra Logo" className="w-14 h-14 object-contain" />
-            <span className="text-3xl font-bold text-foreground">Topper's Siksha Kendra</span>
+            <span className="text-3xl font-bold text-foreground">
+              Topper<span className="text-primary">'s</span> Siksha <span className="text-primary">Kendra</span>
+            </span>
           </div>
           <h1 className="text-2xl font-bold text-foreground mb-2">Welcome Back!</h1>
           <p className="text-muted-foreground">Sign in to continue your learning journey</p>

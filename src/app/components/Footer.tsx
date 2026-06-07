@@ -9,7 +9,9 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <img src="/TKS.png" alt="Topper's Siksha Kendra Logo" className="w-10 h-10 object-contain" />
-              <span className="text-xl font-bold">Topper's Siksha Kendra</span>
+              <span className="text-xl font-bold">
+                Topper<span className="text-primary">'s</span> Siksha <span className="text-primary">Kendra</span>
+              </span>
             </div>
             <p className="text-secondary-foreground/80">
               Empowering students through smart learning with trusted educational partners.
@@ -20,7 +22,6 @@ export default function Footer() {
             <h4 className="font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2">
               <li><Link to="/courses" className="text-secondary-foreground/80 hover:text-primary transition-colors">Courses</Link></li>
-              <li><Link to="/become-vendor" className="text-secondary-foreground/80 hover:text-primary transition-colors">Become a Vendor</Link></li>
               <li><Link to="/login" className="text-secondary-foreground/80 hover:text-primary transition-colors">Login</Link></li>
             </ul>
           </div>
@@ -54,7 +55,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-8 pt-8 border-t border-secondary-foreground/20 text-center text-secondary-foreground/80">
-          <p>&copy; 2026 Topper's Siksha Kendra. All rights reserved.</p>
+          <p>&copy; 2026 Topper<span className="text-primary">'s</span> Siksha <span className="text-primary">Kendra</span>. All rights reserved.</p>
         </div>
       </div>
     </footer>

@@ -1,7 +1,7 @@
 
-  # Generate Full Website
+  # Topper's Siksha Kendra
 
-  This is a code bundle for Generate Full Website. The original project is available at https://www.figma.com/design/HWHrQp45H4viAc2wa7IyiW/Generate-Full-Website.
+  This is a code bundle for Topper's Siksha Kendra.
 
   ## Running the code
 
