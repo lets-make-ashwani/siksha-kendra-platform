@@ -86,11 +86,18 @@ export default function StudentRegistration() {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+    if (name === 'class') {
+      // If they change their class, reset their selected course to avoid mismatches
+      setFormData(prev => ({ ...prev, [name]: value, course: '' }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
+
+  // Only show active courses, and filter them based on the selected class
+  const activeCourses = courses.filter(c => c.status === 'ACTIVE');
+  const filteredCourses = activeCourses.filter(c => formData.class ? c.class === formData.class : true);
 
   if (submitted) {
     return (
@@ -238,7 +245,7 @@ export default function StudentRegistration() {
                 className="w-full px-4 py-3 bg-input-background border border-input rounded-[12px] text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               >
                 <option value="">Choose a course</option>
-                {courses.map(c => (
+                {filteredCourses.map(c => (
                   <option key={c.id} value={c.id}>{c.title}</option>
                 ))}
               </select>

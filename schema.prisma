@@ -116,6 +116,7 @@ model Course {
   thumbnail   String?
   price       Float        @default(0)
   category    String?
+  class       String?
   status      CourseStatus @default(ACTIVE)
   created_at  DateTime     @default(now())
   updated_at  DateTime     @updatedAt

@@ -8,13 +8,14 @@ const courseSchema = z.object({
   description: z.string().optional(),
   price: z.number().min(0),
   category: z.string().optional(),
+  class: z.string().optional(),
   status: z.enum(['ACTIVE', 'DRAFT', 'ARCHIVED']).optional()
 });
 
 export const getCourses = async (req: Request, res: Response): Promise<any> => {
   try {
     const courses = await prisma.course.findMany({
-      where: { status: 'ACTIVE' },
+      include: { _count: { select: { studentLeads: true } } },
       orderBy: { created_at: 'desc' }
     });
     res.json(courses);

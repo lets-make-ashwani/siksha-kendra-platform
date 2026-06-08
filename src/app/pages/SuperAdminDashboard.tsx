@@ -704,7 +704,7 @@ const CourseManagement = () => {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    title: '', slug: '', description: '', price: 0, category: '', status: 'ACTIVE'
+    title: '', slug: '', description: '', price: 0, category: '', class: '', status: 'ACTIVE'
   });
 
   const fetchCourses = async () => {
@@ -737,7 +737,7 @@ const CourseManagement = () => {
       if (response.ok) {
         toast.success('Course added successfully!');
         setIsAddOpen(false);
-        setFormData({ title: '', slug: '', description: '', price: 0, category: '', status: 'ACTIVE' });
+        setFormData({ title: '', slug: '', description: '', price: 0, category: '', class: '', status: 'ACTIVE' });
         fetchCourses();
       } else {
         const data = await response.json();
@@ -784,8 +784,10 @@ const CourseManagement = () => {
             <thead>
               <tr className="border-b border-border">
                 <th className="text-left py-3 px-4 text-sm font-semibold text-foreground">Title</th>
+              <th className="text-left py-3 px-4 text-sm font-semibold text-foreground">Class</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-foreground">Category</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-foreground">Price</th>
+              <th className="text-left py-3 px-4 text-sm font-semibold text-foreground">Enrollments</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-foreground">Status</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-foreground">Actions</th>
               </tr>
@@ -798,8 +800,10 @@ const CourseManagement = () => {
               ) : courses.map((course) => (
                 <tr key={course.id} className="border-b border-border hover:bg-muted/50 transition-colors">
                   <td className="py-3 px-4 text-foreground">{course.title}</td>
+                <td className="py-3 px-4 text-muted-foreground">{course.class || '-'}</td>
                   <td className="py-3 px-4 text-muted-foreground">{course.category}</td>
                   <td className="py-3 px-4 text-foreground">₹{course.price}</td>
+                <td className="py-3 px-4 text-foreground font-semibold">{course._count?.studentLeads || 0}</td>
                   <td className="py-3 px-4">
                     <span className={`px-3 py-1 rounded-[8px] text-sm font-semibold ${course.status === 'ACTIVE' ? 'bg-success/20 text-success' : 'bg-warning/20 text-warning'}`}>
                       {course.status}
@@ -827,6 +831,22 @@ const CourseManagement = () => {
               <Input label="Category" name="category" value={formData.category} onChange={(e) => setFormData({...formData, category: e.target.value})} required />
               <Input label="Price (₹)" type="number" name="price" value={formData.price as any} onChange={(e) => setFormData({...formData, price: Number(e.target.value)})} required min={0} />
             </div>
+          <div>
+            <label className="block mb-2 text-sm font-medium text-foreground">Class</label>
+            <select
+              name="class"
+              value={formData.class}
+              onChange={(e) => setFormData({...formData, class: e.target.value})}
+              required
+              className="w-full px-3 py-2 bg-background border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            >
+              <option value="">Select Class</option>
+              <option value="Class 9">Class 9</option>
+              <option value="Class 10">Class 10</option>
+              <option value="Class 11">Class 11</option>
+              <option value="Class 12">Class 12</option>
+            </select>
+          </div>
             <Input label="Description" name="description" value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} />
             <div className="flex justify-end gap-2 mt-4">
               <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>Cancel</Button>
