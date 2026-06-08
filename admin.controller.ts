@@ -5,8 +5,9 @@ import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.SMTP_PORT || '465'),
-  secure: process.env.SMTP_PORT === '465' || !process.env.SMTP_PORT, // true for 465, false for other ports
+  port: parseInt(process.env.SMTP_PORT || '587'),
+  secure: process.env.SMTP_PORT === '465', // false for 587
+  requireTLS: true,
   auth: {
     user: process.env.SMTP_USER || process.env.EMAIL_USER,
     pass: process.env.SMTP_PASS || process.env.EMAIL_PASS,
@@ -222,5 +223,33 @@ export const getAllVendors = async (req: Request, res: Response): Promise<any> =
     res.json(vendors);
   } catch (error: any) {
     res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+export const deleteVendor = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { id } = req.params;
+    
+    const vendor = await prisma.vendor.findUnique({ where: { id } });
+    if (!vendor) {
+      return res.status(404).json({ message: 'Vendor not found' });
+    }
+
+    // Detach students from this vendor so we don't lose their enrollment data
+    await prisma.studentLead.updateMany({
+      where: { vendor_id: id },
+      data: { vendor_id: null }
+    });
+
+    // Delete the vendor record
+    await prisma.vendor.delete({ where: { id } });
+
+    // Delete the associated user login account
+    const userId = (vendor as any).userId || (vendor as any).user_id;
+    if (userId) await prisma.user.delete({ where: { id: userId } });
+
+    res.json({ message: 'Vendor and associated data deleted successfully.' });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message || 'Error deleting vendor' });
   }
 };

@@ -287,6 +287,30 @@ const VendorManagement = () => {
     fetchVendors();
   }, []);
 
+  const handleDeleteVendor = async (id: string) => {
+    if (!confirm('Are you sure you want to completely delete this vendor? Their student enrollments will be kept but unlinked.')) return;
+    try {
+      const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const apiUrl = rawApiUrl.replace(/\/$/, '');
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch(`${apiUrl}/api/admin/vendors/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        toast.success('Vendor deleted successfully');
+        fetchVendors(); // Refresh the table
+      } else {
+        const data = await response.json();
+        toast.error(data.message || 'Failed to delete vendor');
+      }
+    } catch (err) {
+      toast.error('Error deleting vendor');
+    }
+  };
+
   const handleAddSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -369,6 +393,7 @@ const VendorManagement = () => {
                 <td className="py-3 px-4">
                   <div className="flex gap-2">
                     <Button size="sm" variant="outline" onClick={() => setViewVendor(vendor)}>Details</Button>
+                    <Button size="sm" variant="danger" onClick={() => handleDeleteVendor(vendor.id)}>Delete</Button>
                   </div>
                 </td>
               </tr>

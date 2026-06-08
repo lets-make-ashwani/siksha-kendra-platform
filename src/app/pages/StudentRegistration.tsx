@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router';
 import { CheckCircle } from 'lucide-react';
 import Button from '../components/Button';
@@ -8,6 +8,9 @@ import Card from '../components/Card';
 export default function StudentRegistration() {
   const { referralCode } = useParams();
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [courses, setCourses] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -20,9 +23,56 @@ export default function StudentRegistration() {
     course: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const apiUrl = rawApiUrl.replace(/\/$/, '');
+        const response = await fetch(`${apiUrl}/api/courses`);
+        if (response.ok) {
+          setCourses(await response.json());
+        }
+      } catch (err) {
+        console.error("Failed to load courses", err);
+      }
+    };
+    fetchCourses();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setLoading(true);
+    setError('');
+    
+    try {
+      const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const apiUrl = rawApiUrl.replace(/\/$/, '');
+      
+      const payload = {
+        name: formData.fullName,
+        email: formData.email,
+        phone: formData.mobile,
+        address: formData.address,
+        class: formData.class,
+        course_id: formData.course,
+        referral_code: referralCode || undefined
+      };
+
+      const response = await fetch(`${apiUrl}/api/student-leads`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to submit registration');
+
+      setSubmitted(true);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -74,6 +124,11 @@ export default function StudentRegistration() {
 
         <Card>
           <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="p-3 bg-destructive/10 text-destructive text-sm rounded-[8px]">
+                {error}
+              </div>
+            )}
             <div>
               <h3 className="text-lg font-semibold text-foreground mb-4">Personal Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -177,17 +232,15 @@ export default function StudentRegistration() {
                 className="w-full px-4 py-3 bg-input-background border border-input rounded-[12px] text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               >
                 <option value="">Choose a course</option>
-                <option value="JEE Advanced Preparation">JEE Advanced Preparation</option>
-                <option value="NEET Complete Course">NEET Complete Course</option>
-                <option value="CBSE Mathematics">CBSE Mathematics</option>
-                <option value="Physics Masterclass">Physics Masterclass</option>
-                <option value="Chemistry Complete">Chemistry Complete</option>
+                {courses.map(c => (
+                  <option key={c.id} value={c.id}>{c.title}</option>
+                ))}
               </select>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button type="submit" size="lg" className="flex-1">
-                Submit Registration
+              <Button type="submit" size="lg" className="flex-1" disabled={loading}>
+                {loading ? 'Submitting...' : 'Submit Registration'}
               </Button>
               <Button type="button" variant="outline" size="lg" className="flex-1" onClick={() => window.history.back()}>
                 Cancel
