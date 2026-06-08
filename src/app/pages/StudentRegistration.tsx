@@ -64,8 +64,15 @@ export default function StudentRegistration() {
         body: JSON.stringify(payload)
       });
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Failed to submit registration');
+      const contentType = response.headers.get("content-type");
+      if (!response.ok) {
+        if (contentType && contentType.includes("application/json")) {
+          const errData = await response.json();
+          throw new Error(errData.message || 'Failed to submit registration');
+        } else {
+          throw new Error('Server returned HTML instead of JSON. Ensure your POST /api/student-leads route is publicly accessible in the backend.');
+        }
+      }
 
       setSubmitted(true);
     } catch (err: any) {

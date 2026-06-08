@@ -1,4 +1,4 @@
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 import { z } from 'zod';
 import { prisma } from './index';
 import { AuthRequest } from './auth.middleware';
@@ -9,11 +9,11 @@ const leadSchema = z.object({
   email: z.string().email(),
   address: z.string().optional(),
   class: z.string().optional(),
-  course_id: z.string().uuid(),
+  course_id: z.string(),
   referral_code: z.string().optional(),
 });
 
-export const submitLead = async (req: AuthRequest, res: Response): Promise<any> => {
+export const submitLead = async (req: Request, res: Response): Promise<any> => {
   try {
     const data = leadSchema.parse(req.body);
     let vendorId = null;
