@@ -182,19 +182,19 @@ const Dashboard = () => {
                     <div className="flex items-center gap-2">
                       <button 
                         onClick={() => setConfirmApproveId(vendor.id)} 
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-success/10 hover:bg-success text-success hover:text-white rounded-md text-sm font-medium transition-colors"
+                        className="flex items-center gap-1.5 px-4 py-1.5 bg-[#22C55E] hover:bg-[#16a34a] text-white rounded-md text-sm font-semibold shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#22C55E]/50"
                       >
                         <CheckCircle className="w-4 h-4" /> Approve
                       </button>
                       <button 
                         onClick={() => handleAction(vendor.id, 'reject')} 
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-destructive/10 hover:bg-destructive text-destructive hover:text-white rounded-md text-sm font-medium transition-colors"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-[#EF4444]/10 hover:bg-[#EF4444] text-[#EF4444] hover:text-white rounded-md text-sm font-medium transition-colors"
                       >
                         <XCircle className="w-4 h-4" /> Reject
                       </button>
                       <button 
                         onClick={() => setViewApp(vendor)} 
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 hover:bg-primary text-primary hover:text-white rounded-md text-sm font-medium transition-colors"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-[#FF6B00]/10 hover:bg-[#FF6B00] text-[#FF6B00] hover:text-white rounded-md text-sm font-medium transition-colors"
                       >
                         <Eye className="w-4 h-4" /> View
                       </button>
@@ -315,7 +315,8 @@ const VendorManagement = () => {
   const [vendors, setVendors] = useState<any[]>([]);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [viewVendor, setViewVendor] = useState<any>(null);
+  const [viewVendorPerformance, setViewVendorPerformance] = useState<any>(null);
+  const [viewVendorDetails, setViewVendorDetails] = useState<any>(null);
   const [newVendorCreds, setNewVendorCreds] = useState<any>(null);
   const [formData, setFormData] = useState({
     name: '', email: '', phone: '', address: '', city: '', state: '', pincode: ''
@@ -437,7 +438,7 @@ const VendorManagement = () => {
               <tr key={vendor.id} className="border-b border-border hover:bg-muted/50 transition-colors">
                 <td className="py-3 px-4 text-foreground">{vendor.vendor_id}</td>
                 <td className="py-3 px-4">
-                  <button onClick={() => setViewVendor(vendor)} className="text-primary font-medium hover:underline text-left focus:outline-none">
+                  <button onClick={() => setViewVendorPerformance(vendor)} className="text-primary font-medium hover:underline text-left focus:outline-none">
                     {vendor.user?.name}
                   </button>
                 </td>
@@ -451,7 +452,7 @@ const VendorManagement = () => {
                 </td>
                 <td className="py-3 px-4">
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline" onClick={() => setViewVendor(vendor)}>Details</Button>
+                    <Button size="sm" variant="outline" onClick={() => setViewVendorDetails(vendor)}>Details</Button>
                     <Button size="sm" variant="danger" onClick={() => handleDeleteVendor(vendor.id)}>Delete</Button>
                   </div>
                 </td>
@@ -503,25 +504,145 @@ const VendorManagement = () => {
       </DialogContent>
     </Dialog>
 
-    <Dialog open={!!viewVendor} onOpenChange={(open) => !open && setViewVendor(null)}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+    <Dialog open={!!viewVendorPerformance} onOpenChange={(open) => !open && setViewVendorPerformance(null)}>
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Vendor Details</DialogTitle>
+          <DialogTitle className="flex justify-between items-center pr-6">
+            <span>Vendor Performance Dashboard</span>
+            <Button variant="danger" size="sm" onClick={() => { handleDeleteVendor(viewVendorPerformance.id); setViewVendorPerformance(null); }}>
+              Delete Vendor
+            </Button>
+          </DialogTitle>
         </DialogHeader>
-        {viewVendor && (
+        {viewVendorPerformance && (() => {
+          const vendorStudents = viewVendorPerformance.studentLeads || [];
+          const totalReferred = vendorStudents.length;
+          const approvedCount = vendorStudents.filter((s: any) => s.status === 'APPROVED').length;
+          const pendingCount = vendorStudents.filter((s: any) => s.status !== 'APPROVED').length;
+          
+          const currentYear = new Date().getFullYear();
+          const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+          const counts = new Array(12).fill(0);
+          
+          let monthlyStudents = 0;
+          let todaysStudents = 0;
+          const today = new Date();
+          
+          vendorStudents.forEach((student: any) => {
+            const date = new Date(student.created_at);
+            if (date.getFullYear() === currentYear) {
+              counts[date.getMonth()] += 1;
+              if (date.getMonth() === today.getMonth()) {
+                monthlyStudents += 1;
+              }
+            }
+            if (date.toDateString() === today.toDateString()) {
+              todaysStudents += 1;
+            }
+          });
+          
+          const currentMonth = new Date().getMonth();
+          const vendorChartData = months.slice(0, currentMonth + 1).map((month, idx) => ({ month, students: counts[idx] }));
+
+          return (
+            <div className="space-y-6 mt-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-primary/10 p-4 rounded-[12px] border border-primary/20">
+                  <p className="text-sm text-primary font-semibold mb-1">Total Referrals</p>
+                  <p className="text-2xl font-bold text-foreground">{totalReferred}</p>
+                </div>
+                <div className="bg-success/10 p-4 rounded-[12px] border border-success/20">
+                  <p className="text-sm text-success font-semibold mb-1">Monthly Referrals</p>
+                  <p className="text-2xl font-bold text-foreground">{monthlyStudents}</p>
+                </div>
+                <div className="bg-warning/10 p-4 rounded-[12px] border border-warning/20">
+                  <p className="text-sm text-warning font-semibold mb-1">Today's Referrals</p>
+                  <p className="text-2xl font-bold text-foreground">{todaysStudents}</p>
+                </div>
+                <div className="bg-[#0B1B52]/10 p-4 rounded-[12px] border border-[#0B1B52]/20">
+                  <p className="text-sm text-[#0B1B52] font-semibold mb-1">Approved Students</p>
+                  <p className="text-2xl font-bold text-foreground">{approvedCount}</p>
+                </div>
+              </div>
+
+              <div className="bg-card border border-border rounded-[12px] p-4">
+                <h4 className="font-semibold mb-4 text-foreground">Monthly Performance</h4>
+                <ResponsiveContainer width="100%" height={250}>
+                  <BarChart data={vendorChartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                    <XAxis dataKey="month" stroke="#6B7280" />
+                    <YAxis stroke="#6B7280" />
+                    <Tooltip cursor={{ fill: 'rgba(0,0,0,0.05)' }} />
+                    <Bar dataKey="students" fill="#FF6B00" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+
+              <div className="mt-6">
+                <h4 className="font-semibold mb-4 text-foreground">Referred Students List</h4>
+                <div className="overflow-x-auto border border-border rounded-[12px]">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted/20">
+                      <tr className="border-b border-border">
+                        <th className="text-left py-3 px-4 font-semibold text-foreground">Student Name</th>
+                        <th className="text-left py-3 px-4 font-semibold text-foreground">Phone</th>
+                        <th className="text-left py-3 px-4 font-semibold text-foreground">Class</th>
+                        <th className="text-left py-3 px-4 font-semibold text-foreground">Course</th>
+                        <th className="text-left py-3 px-4 font-semibold text-foreground">Status</th>
+                        <th className="text-left py-3 px-4 font-semibold text-foreground">Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {vendorStudents.length === 0 ? (
+                        <tr><td colSpan={6} className="py-6 text-center text-muted-foreground">No students referred yet.</td></tr>
+                      ) : vendorStudents.map((student: any, idx: number) => (
+                        <tr key={idx} className="border-b border-border hover:bg-muted/50 transition-colors">
+                          <td className="py-3 px-4 text-foreground font-medium">{student.name}</td>
+                          <td className="py-3 px-4 text-muted-foreground">{student.phone}</td>
+                          <td className="py-3 px-4 text-muted-foreground">{student.class || '-'}</td>
+                          <td className="py-3 px-4 text-muted-foreground">{student.course?.title || 'Unknown'}</td>
+                          <td className="py-3 px-4">
+                            <span className={`px-2 py-1 rounded-[6px] text-xs font-semibold ${student.status === 'APPROVED' ? 'bg-success/20 text-success' : 'bg-warning/20 text-warning'}`}>
+                              {student.status || 'PENDING'}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 text-muted-foreground">{new Date(student.created_at).toLocaleDateString()}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+      </DialogContent>
+    </Dialog>
+
+    <Dialog open={!!viewVendorDetails} onOpenChange={(open) => !open && setViewVendorDetails(null)}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex justify-between items-center pr-6">
+            <span>Vendor Basic Information</span>
+            <Button variant="danger" size="sm" onClick={() => { handleDeleteVendor(viewVendorDetails.id); setViewVendorDetails(null); }}>
+              Delete Vendor
+            </Button>
+          </DialogTitle>
+        </DialogHeader>
+        {viewVendorDetails && (
           <div className="space-y-6 mt-4">
             <div className="grid grid-cols-2 gap-4 text-sm">
-              <p><strong>Vendor ID:</strong> {viewVendor.vendor_id}</p>
-              <p><strong>Referral Code:</strong> {viewVendor.referral_code}</p>
-              <p><strong>Name:</strong> {viewVendor.user?.name}</p>
-              <p><strong>Email:</strong> {viewVendor.user?.email}</p>
-              <p><strong>Phone:</strong> {viewVendor.user?.phone}</p>
-              <p><strong>Address:</strong> {viewVendor.address}, {viewVendor.city}, {viewVendor.state} - {viewVendor.pincode}</p>
-              <p><strong>Aadhaar Number:</strong> {viewVendor.aadhaar_number}</p>
-              <p><strong>PAN Number:</strong> {viewVendor.pan_number}</p>
-              <p><strong>Bank:</strong> {viewVendor.bank_name} ({viewVendor.branch_name})</p>
-              <p><strong>Account No:</strong> {viewVendor.account_number}</p>
-              <p><strong>IFSC:</strong> {viewVendor.ifsc_code}</p>
+              <p><strong>Vendor ID:</strong> {viewVendorDetails.vendor_id}</p>
+              <p><strong>Referral Code:</strong> {viewVendorDetails.referral_code}</p>
+              <p><strong>Name:</strong> {viewVendorDetails.user?.name}</p>
+              <p><strong>Email:</strong> {viewVendorDetails.user?.email}</p>
+              <p><strong>Phone:</strong> {viewVendorDetails.user?.phone}</p>
+              <p><strong>Address:</strong> {viewVendorDetails.address}, {viewVendorDetails.city}, {viewVendorDetails.state} - {viewVendorDetails.pincode}</p>
+              <p><strong>Aadhaar Number:</strong> {viewVendorDetails.aadhaar_number}</p>
+              <p><strong>PAN Number:</strong> {viewVendorDetails.pan_number}</p>
+              <p><strong>Bank:</strong> {viewVendorDetails.bank_name} ({viewVendorDetails.branch_name})</p>
+              <p><strong>Account No:</strong> {viewVendorDetails.account_number}</p>
+              <p><strong>IFSC:</strong> {viewVendorDetails.ifsc_code}</p>
             </div>
             
             <div className="bg-warning/10 border border-warning/20 p-4 rounded-[8px]">
@@ -533,17 +654,17 @@ const VendorManagement = () => {
             <div>
               <h4 className="font-semibold mb-3">Uploaded Documents</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {viewVendor.aadhaar_front && (
-                  <div className="border rounded p-2"><p className="text-xs text-center mb-2 font-medium">Aadhaar (Front)</p><img src={viewVendor.aadhaar_front} alt="Aadhaar Front" className="w-full h-auto object-contain rounded cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setFullScreenImage(viewVendor.aadhaar_front)} /></div>
+                {viewVendorDetails.aadhaar_front && (
+                  <div className="border rounded p-2"><p className="text-xs text-center mb-2 font-medium">Aadhaar (Front)</p><img src={viewVendorDetails.aadhaar_front} alt="Aadhaar Front" className="w-full h-auto object-contain rounded cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setFullScreenImage(viewVendorDetails.aadhaar_front)} /></div>
                 )}
-                {viewVendor.aadhaar_back && (
-                  <div className="border rounded p-2"><p className="text-xs text-center mb-2 font-medium">Aadhaar (Back)</p><img src={viewVendor.aadhaar_back} alt="Aadhaar Back" className="w-full h-auto object-contain rounded cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setFullScreenImage(viewVendor.aadhaar_back)} /></div>
+                {viewVendorDetails.aadhaar_back && (
+                  <div className="border rounded p-2"><p className="text-xs text-center mb-2 font-medium">Aadhaar (Back)</p><img src={viewVendorDetails.aadhaar_back} alt="Aadhaar Back" className="w-full h-auto object-contain rounded cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setFullScreenImage(viewVendorDetails.aadhaar_back)} /></div>
                 )}
-                {viewVendor.pan_image && (
-                  <div className="border rounded p-2"><p className="text-xs text-center mb-2 font-medium">PAN Card</p><img src={viewVendor.pan_image} alt="PAN Card" className="w-full h-auto object-contain rounded cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setFullScreenImage(viewVendor.pan_image)} /></div>
+                {viewVendorDetails.pan_image && (
+                  <div className="border rounded p-2"><p className="text-xs text-center mb-2 font-medium">PAN Card</p><img src={viewVendorDetails.pan_image} alt="PAN Card" className="w-full h-auto object-contain rounded cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setFullScreenImage(viewVendorDetails.pan_image)} /></div>
                 )}
-                {viewVendor.passbook_image && (
-                  <div className="border rounded p-2"><p className="text-xs text-center mb-2 font-medium">Bank Passbook</p><img src={viewVendor.passbook_image} alt="Passbook" className="w-full h-auto object-contain rounded cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setFullScreenImage(viewVendor.passbook_image)} /></div>
+                {viewVendorDetails.passbook_image && (
+                  <div className="border rounded p-2"><p className="text-xs text-center mb-2 font-medium">Bank Passbook</p><img src={viewVendorDetails.passbook_image} alt="Passbook" className="w-full h-auto object-contain rounded cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setFullScreenImage(viewVendorDetails.passbook_image)} /></div>
                 )}
               </div>
             </div>
@@ -632,12 +753,13 @@ const StudentManagement = () => {
               <th className="text-left py-3 px-4 text-sm font-semibold text-foreground">Class</th>
               <th className="text-left py-3 px-4 text-sm font-semibold text-foreground">Phone</th>
               <th className="text-left py-3 px-4 text-sm font-semibold text-foreground">Status</th>
+              <th className="text-left py-3 px-4 text-sm font-semibold text-foreground">Actions</th>
             </tr>
           </thead>
           <tbody>
             {students.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-muted-foreground">No students have enrolled yet.</td>
+                  <td colSpan={8} className="py-8 text-center text-muted-foreground">No students have enrolled yet.</td>
                 </tr>
             ) : students.map((student) => (
               <tr key={student.id} className="border-b border-border hover:bg-muted/50 transition-colors">
@@ -663,6 +785,9 @@ const StudentManagement = () => {
                     <option value="APPROVED">APPROVED</option>
                   </select>
                 </td>
+                <td className="py-3 px-4">
+                  <Button size="sm" variant="outline" onClick={() => setViewStudent(student)}>Details</Button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -676,7 +801,8 @@ const StudentManagement = () => {
           <DialogTitle>Student Details</DialogTitle>
         </DialogHeader>
         {viewStudent && (
-          <div className="space-y-6 mt-4">
+          <div className="space-y-4 mt-4">
+            <h4 className="font-semibold text-foreground border-b border-border pb-2">Basic Information</h4>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <p><strong>Enrollment ID:</strong> {viewStudent.enrollment_id || '-'}</p>
               <p><strong>Name:</strong> {viewStudent.name}</p>

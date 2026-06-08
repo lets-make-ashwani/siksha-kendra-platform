@@ -187,11 +187,12 @@ const Dashboard = () => {
                 <th className="text-left py-3 px-4 text-sm font-semibold text-foreground">Course</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-foreground">Status</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-foreground">Date</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-foreground">Actions</th>
               </tr>
             </thead>
             <tbody>
               {recentStudents.length === 0 ? (
-                 <tr><td colSpan={6} className="py-6 text-center text-muted-foreground">No students referred yet.</td></tr>
+                 <tr><td colSpan={7} className="py-6 text-center text-muted-foreground">No students referred yet.</td></tr>
               ) : recentStudents.map((student, idx) => (
                 <tr key={idx} className="border-b border-border">
                   <td className="py-3 px-4">
@@ -208,6 +209,9 @@ const Dashboard = () => {
                     </span>
                   </td>
                   <td className="py-3 px-4 text-muted-foreground">{new Date(student.created_at).toLocaleDateString()}</td>
+                  <td className="py-3 px-4">
+                    <Button size="sm" variant="outline" onClick={() => setViewStudent(student)}>Details</Button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -221,7 +225,8 @@ const Dashboard = () => {
             <DialogTitle>Student Details</DialogTitle>
           </DialogHeader>
           {viewStudent && (
-            <div className="space-y-6 mt-4">
+            <div className="space-y-4 mt-4">
+              <h4 className="font-semibold text-foreground border-b border-border pb-2">Basic Information</h4>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <p><strong>Enrollment ID:</strong> {viewStudent.enrollment_id || '-'}</p>
                 <p><strong>Name:</strong> {viewStudent.name}</p>
@@ -285,11 +290,12 @@ const StudentList = () => {
               <th className="text-left py-3 px-4 text-sm font-semibold text-foreground">Course</th>
               <th className="text-left py-3 px-4 text-sm font-semibold text-foreground">Status</th>
               <th className="text-left py-3 px-4 text-sm font-semibold text-foreground">Enrolled</th>
+              <th className="text-left py-3 px-4 text-sm font-semibold text-foreground">Actions</th>
             </tr>
           </thead>
           <tbody>
             {students.length === 0 ? (
-                 <tr><td colSpan={7} className="py-6 text-center text-muted-foreground">No students referred yet.</td></tr>
+                 <tr><td colSpan={8} className="py-6 text-center text-muted-foreground">No students referred yet.</td></tr>
             ) : students.map((student) => (
               <tr key={student.id} className="border-b border-border hover:bg-muted/50 transition-colors">
                 <td className="py-3 px-4">
@@ -307,6 +313,9 @@ const StudentList = () => {
                   </span>
                 </td>
                 <td className="py-3 px-4 text-muted-foreground">{new Date(student.created_at).toLocaleDateString()}</td>
+                <td className="py-3 px-4">
+                  <Button size="sm" variant="outline" onClick={() => setViewStudent(student)}>Details</Button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -320,7 +329,8 @@ const StudentList = () => {
           <DialogTitle>Student Details</DialogTitle>
         </DialogHeader>
         {viewStudent && (
-          <div className="space-y-6 mt-4">
+          <div className="space-y-4 mt-4">
+            <h4 className="font-semibold text-foreground border-b border-border pb-2">Basic Information</h4>
             <div className="grid grid-cols-2 gap-4 text-sm">
                 <p><strong>Enrollment ID:</strong> {viewStudent.enrollment_id || '-'}</p>
               <p><strong>Name:</strong> {viewStudent.name}</p>

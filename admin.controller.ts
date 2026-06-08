@@ -252,7 +252,14 @@ export const rejectApplication = async (req: Request, res: Response): Promise<an
 export const getAllVendors = async (req: Request, res: Response): Promise<any> => {
   try {
     const vendors = await prisma.vendor.findMany({
-      include: { user: true, _count: { select: { studentLeads: true } } },
+      include: { 
+        user: true, 
+        studentLeads: { 
+          include: { course: true },
+          orderBy: { created_at: 'desc' } 
+        },
+        _count: { select: { studentLeads: true } } 
+      },
       orderBy: { created_at: 'desc' }
     });
     res.json(vendors);
