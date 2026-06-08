@@ -288,3 +288,18 @@ export const deleteVendor = async (req: Request, res: Response): Promise<any> =>
     res.status(500).json({ message: error.message || 'Error deleting vendor' });
   }
 };
+
+export const updateStudentStatus = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    
+    const student = await prisma.studentLead.update({
+      where: { id },
+      data: { status }
+    });
+    res.json({ message: 'Status updated successfully', student });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message || 'Error updating student status' });
+  }
+};

@@ -203,8 +203,8 @@ const Dashboard = () => {
                   <td className="py-3 px-4 text-muted-foreground">{student.class || '-'}</td>
                   <td className="py-3 px-4 text-muted-foreground">{student.course?.title || 'Unknown'}</td>
                   <td className="py-3 px-4">
-                    <span className="px-3 py-1 bg-success/20 text-success rounded-[8px] text-sm font-semibold">
-                      Enrolled
+                    <span className={`px-3 py-1 rounded-[8px] text-sm font-semibold ${student.status === 'APPROVED' ? 'bg-success/20 text-success' : 'bg-warning/20 text-warning'}`}>
+                      {student.status || 'PENDING'}
                     </span>
                   </td>
                   <td className="py-3 px-4 text-muted-foreground">{new Date(student.created_at).toLocaleDateString()}</td>
@@ -229,6 +229,7 @@ const Dashboard = () => {
                 <p><strong>Phone:</strong> {viewStudent.phone}</p>
                 <p><strong>Class:</strong> {viewStudent.class || '-'}</p>
                 <p><strong>Course:</strong> {viewStudent.course?.title || '-'}</p>
+                <p><strong>Status:</strong> <span className={viewStudent.status === 'APPROVED' ? 'text-success font-semibold' : 'text-warning font-semibold'}>{viewStudent.status || 'PENDING'}</span></p>
                 <p><strong>Address:</strong> {viewStudent.address || '-'}</p>
                 <p><strong>School Name:</strong> {viewStudent.school_name || '-'}</p>
                 <p><strong>Parent Name:</strong> {viewStudent.parent_name || '-'}</p>
@@ -301,8 +302,8 @@ const StudentList = () => {
                 <td className="py-3 px-4 text-muted-foreground">{student.class || '-'}</td>
                 <td className="py-3 px-4 text-muted-foreground">{student.course?.title || 'Unknown'}</td>
                 <td className="py-3 px-4">
-                  <span className="px-3 py-1 bg-success/20 text-success rounded-[8px] text-sm font-semibold">
-                    Enrolled
+                  <span className={`px-3 py-1 rounded-[8px] text-sm font-semibold ${student.status === 'APPROVED' ? 'bg-success/20 text-success' : 'bg-warning/20 text-warning'}`}>
+                    {student.status || 'PENDING'}
                   </span>
                 </td>
                 <td className="py-3 px-4 text-muted-foreground">{new Date(student.created_at).toLocaleDateString()}</td>
@@ -327,6 +328,7 @@ const StudentList = () => {
               <p><strong>Phone:</strong> {viewStudent.phone}</p>
               <p><strong>Class:</strong> {viewStudent.class || '-'}</p>
               <p><strong>Course:</strong> {viewStudent.course?.title || '-'}</p>
+              <p><strong>Status:</strong> <span className={viewStudent.status === 'APPROVED' ? 'text-success font-semibold' : 'text-warning font-semibold'}>{viewStudent.status || 'PENDING'}</span></p>
               <p><strong>Address:</strong> {viewStudent.address || '-'}</p>
               <p><strong>School Name:</strong> {viewStudent.school_name || '-'}</p>
               <p><strong>Parent Name:</strong> {viewStudent.parent_name || '-'}</p>

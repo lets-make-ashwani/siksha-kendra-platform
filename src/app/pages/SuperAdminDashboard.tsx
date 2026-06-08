@@ -30,6 +30,7 @@ const Dashboard = () => {
   const [viewApp, setViewApp] = useState<any>(null);
   const [newVendorCreds, setNewVendorCreds] = useState<any>(null);
   const [confirmApproveId, setConfirmApproveId] = useState<string | null>(null);
+  const [fullScreenImage, setFullScreenImage] = useState<string | null>(null);
 
   const fetchDashboardData = async () => {
       try {
@@ -230,19 +231,19 @@ const Dashboard = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div className="border rounded p-2">
                     <p className="text-xs text-center mb-2 font-medium">Aadhaar (Front)</p>
-                    <img src={viewApp.aadhaar_front} alt="Aadhaar Front" className="w-full h-auto object-contain rounded" />
+                    <img src={viewApp.aadhaar_front} alt="Aadhaar Front" className="w-full h-auto object-contain rounded cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setFullScreenImage(viewApp.aadhaar_front)} />
                   </div>
                   <div className="border rounded p-2">
                     <p className="text-xs text-center mb-2 font-medium">Aadhaar (Back)</p>
-                    <img src={viewApp.aadhaar_back} alt="Aadhaar Back" className="w-full h-auto object-contain rounded" />
+                    <img src={viewApp.aadhaar_back} alt="Aadhaar Back" className="w-full h-auto object-contain rounded cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setFullScreenImage(viewApp.aadhaar_back)} />
                   </div>
                   <div className="border rounded p-2">
                     <p className="text-xs text-center mb-2 font-medium">PAN Card</p>
-                    <img src={viewApp.pan_image} alt="PAN Card" className="w-full h-auto object-contain rounded" />
+                    <img src={viewApp.pan_image} alt="PAN Card" className="w-full h-auto object-contain rounded cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setFullScreenImage(viewApp.pan_image)} />
                   </div>
                   <div className="border rounded p-2">
                     <p className="text-xs text-center mb-2 font-medium">Bank Passbook</p>
-                    <img src={viewApp.passbook_image} alt="Passbook" className="w-full h-auto object-contain rounded" />
+                    <img src={viewApp.passbook_image} alt="Passbook" className="w-full h-auto object-contain rounded cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setFullScreenImage(viewApp.passbook_image)} />
                   </div>
                 </div>
               </div>
@@ -295,6 +296,17 @@ const Dashboard = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={!!fullScreenImage} onOpenChange={(open) => !open && setFullScreenImage(null)}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Document View</DialogTitle>
+          </DialogHeader>
+          <div className="mt-2 flex justify-center">
+            <img src={fullScreenImage || ''} alt="Full Document View" className="max-w-full max-h-[75vh] object-contain rounded" />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
@@ -308,6 +320,7 @@ const VendorManagement = () => {
   const [formData, setFormData] = useState({
     name: '', email: '', phone: '', address: '', city: '', state: '', pincode: ''
   });
+  const [fullScreenImage, setFullScreenImage] = useState<string | null>(null);
 
   const fetchVendors = async () => {
       try {
@@ -521,21 +534,32 @@ const VendorManagement = () => {
               <h4 className="font-semibold mb-3">Uploaded Documents</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {viewVendor.aadhaar_front && (
-                  <div className="border rounded p-2"><p className="text-xs text-center mb-2 font-medium">Aadhaar (Front)</p><img src={viewVendor.aadhaar_front} alt="Aadhaar Front" className="w-full h-auto object-contain rounded" /></div>
+                  <div className="border rounded p-2"><p className="text-xs text-center mb-2 font-medium">Aadhaar (Front)</p><img src={viewVendor.aadhaar_front} alt="Aadhaar Front" className="w-full h-auto object-contain rounded cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setFullScreenImage(viewVendor.aadhaar_front)} /></div>
                 )}
                 {viewVendor.aadhaar_back && (
-                  <div className="border rounded p-2"><p className="text-xs text-center mb-2 font-medium">Aadhaar (Back)</p><img src={viewVendor.aadhaar_back} alt="Aadhaar Back" className="w-full h-auto object-contain rounded" /></div>
+                  <div className="border rounded p-2"><p className="text-xs text-center mb-2 font-medium">Aadhaar (Back)</p><img src={viewVendor.aadhaar_back} alt="Aadhaar Back" className="w-full h-auto object-contain rounded cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setFullScreenImage(viewVendor.aadhaar_back)} /></div>
                 )}
                 {viewVendor.pan_image && (
-                  <div className="border rounded p-2"><p className="text-xs text-center mb-2 font-medium">PAN Card</p><img src={viewVendor.pan_image} alt="PAN Card" className="w-full h-auto object-contain rounded" /></div>
+                  <div className="border rounded p-2"><p className="text-xs text-center mb-2 font-medium">PAN Card</p><img src={viewVendor.pan_image} alt="PAN Card" className="w-full h-auto object-contain rounded cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setFullScreenImage(viewVendor.pan_image)} /></div>
                 )}
                 {viewVendor.passbook_image && (
-                  <div className="border rounded p-2"><p className="text-xs text-center mb-2 font-medium">Bank Passbook</p><img src={viewVendor.passbook_image} alt="Passbook" className="w-full h-auto object-contain rounded" /></div>
+                  <div className="border rounded p-2"><p className="text-xs text-center mb-2 font-medium">Bank Passbook</p><img src={viewVendor.passbook_image} alt="Passbook" className="w-full h-auto object-contain rounded cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setFullScreenImage(viewVendor.passbook_image)} /></div>
                 )}
               </div>
             </div>
           </div>
         )}
+      </DialogContent>
+    </Dialog>
+
+    <Dialog open={!!fullScreenImage} onOpenChange={(open) => !open && setFullScreenImage(null)}>
+      <DialogContent className="max-w-4xl">
+        <DialogHeader>
+          <DialogTitle>Document View</DialogTitle>
+        </DialogHeader>
+        <div className="mt-2 flex justify-center">
+          <img src={fullScreenImage || ''} alt="Full Document View" className="max-w-full max-h-[75vh] object-contain rounded" />
+        </div>
       </DialogContent>
     </Dialog>
   </div>
@@ -563,6 +587,32 @@ const StudentManagement = () => {
     };
     fetchStudents();
   }, []);
+
+  const handleStatusChange = async (id: string, newStatus: string) => {
+    try {
+      const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const apiUrl = rawApiUrl.replace(/\/$/, '');
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch(`${apiUrl}/api/admin/students/${id}/status`, {
+        method: 'PATCH',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify({ status: newStatus })
+      });
+      
+      if (response.ok) {
+        toast.success('Student status updated');
+        fetchStudents();
+      } else {
+        toast.error('Failed to update status');
+      }
+    } catch (error) {
+      toast.error('Error updating status');
+    }
+  };
 
   return (
   <div className="p-6">
@@ -602,9 +652,16 @@ const StudentManagement = () => {
                 <td className="py-3 px-4 text-muted-foreground">{student.class || '-'}</td>
                 <td className="py-3 px-4 text-muted-foreground">{student.phone}</td>
                 <td className="py-3 px-4">
-                  <span className="px-3 py-1 bg-success/20 text-success rounded-[8px] text-sm font-semibold">
-                    Enrolled
-                  </span>
+                  <select
+                    value={student.status || 'PENDING'}
+                    onChange={(e) => handleStatusChange(student.id, e.target.value)}
+                    className={`px-2 py-1 rounded-[8px] text-sm font-semibold border-0 outline-none cursor-pointer ${
+                      student.status === 'APPROVED' ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'
+                    }`}
+                  >
+                    <option value="PENDING">PENDING</option>
+                    <option value="APPROVED">APPROVED</option>
+                  </select>
                 </td>
               </tr>
             ))}
@@ -628,6 +685,7 @@ const StudentManagement = () => {
               <p><strong>Class:</strong> {viewStudent.class || '-'}</p>
               <p><strong>Course:</strong> {viewStudent.course?.title || '-'}</p>
               <p><strong>Vendor:</strong> {viewStudent.vendor?.user?.name || 'Direct Enrollment'}</p>
+              <p><strong>Status:</strong> <span className={viewStudent.status === 'APPROVED' ? 'text-success font-semibold' : 'text-warning font-semibold'}>{viewStudent.status || 'PENDING'}</span></p>
               <p><strong>Address:</strong> {viewStudent.address || '-'}</p>
               <p><strong>School Name:</strong> {viewStudent.school_name || '-'}</p>
               <p><strong>Parent Name:</strong> {viewStudent.parent_name || '-'}</p>
