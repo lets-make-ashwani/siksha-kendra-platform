@@ -28,6 +28,7 @@ const Dashboard = () => {
   const [pendingApps, setPendingApps] = useState<any[]>([]);
   const [viewApp, setViewApp] = useState<any>(null);
   const [newVendorCreds, setNewVendorCreds] = useState<any>(null);
+  const [confirmApproveId, setConfirmApproveId] = useState<string | null>(null);
 
   const fetchDashboardData = async () => {
       try {
@@ -187,7 +188,7 @@ const Dashboard = () => {
                   <td className="py-4 px-4">
                     <div className="flex items-center gap-2">
                       <button 
-                        onClick={() => handleAction(vendor.id, 'approve')} 
+                        onClick={() => setConfirmApproveId(vendor.id)} 
                         className="flex items-center gap-1.5 px-3 py-1.5 bg-success/10 hover:bg-success text-success hover:text-white rounded-md text-sm font-medium transition-colors"
                       >
                         <CheckCircle className="w-4 h-4" /> Approve
@@ -274,6 +275,31 @@ const Dashboard = () => {
             <Button className="w-full" onClick={() => { navigator.clipboard.writeText(`Email: ${newVendorCreds?.email} | Password: ${newVendorCreds?.password}`); toast.success('Copied to clipboard!'); }}>
               Copy Credentials
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!confirmApproveId} onOpenChange={(open) => !open && setConfirmApproveId(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Vendor Approval</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-2 text-sm">
+            <p className="text-foreground text-base">
+              Are you sure you want to approve this application?
+            </p>
+            <p className="text-muted-foreground">
+              This action will create a new vendor account, generate secure login credentials, and automatically send an approval email to the applicant.
+            </p>
+            <div className="flex justify-end gap-3 mt-6">
+              <Button type="button" variant="outline" onClick={() => setConfirmApproveId(null)}>Cancel</Button>
+              <Button type="button" onClick={() => {
+                if (confirmApproveId) {
+                  handleAction(confirmApproveId, 'approve');
+                  setConfirmApproveId(null);
+                }
+              }}>Yes, Approve Vendor</Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>

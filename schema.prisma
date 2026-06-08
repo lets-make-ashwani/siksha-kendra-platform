@@ -56,16 +56,16 @@ model VendorApplication {
   city       String
   state      String
   pincode    String
-  aadhaar_number String
-  pan_number     String
-  aadhaar_front  String
-  aadhaar_back   String
-  pan_image      String
-  bank_name      String
-  branch_name    String
-  account_number String
-  ifsc_code      String
-  passbook_image String
+  aadhaar_number String?
+  pan_number     String?
+  aadhaar_front  String?
+  aadhaar_back   String?
+  pan_image      String?
+  bank_name      String?
+  branch_name    String?
+  account_number String?
+  ifsc_code      String?
+  passbook_image String?
   status     ApplicationStatus @default(PENDING)
   created_at DateTime          @default(now())
   updated_at DateTime          @updatedAt
