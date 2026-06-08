@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate, useNavigate } from 'react-router';
 import { useState, useEffect } from 'react';
-import { Users, BookOpen, UserCheck, Bell, BarChart3, Settings, UserCircle, GraduationCap, CheckCircle, XCircle, Eye, LogOut } from 'lucide-react';
+import { Users, BookOpen, UserCheck, Bell, BarChart3, Settings, UserCircle, GraduationCap, CheckCircle, XCircle, Eye, LogOut, Calendar, Clock, IndianRupee, Wallet } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import Sidebar from '../components/Sidebar';
 import StatCard from '../components/StatCard';
@@ -526,7 +526,10 @@ const VendorManagement = () => {
       <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex justify-between items-center pr-6">
-            <span>Vendor Performance Dashboard</span>
+            <div className="flex flex-col gap-1">
+              <span className="text-xl">Performance Dashboard</span>
+              <span className="text-sm font-normal text-muted-foreground">Vendor: {viewVendorPerformance?.user?.name} ({viewVendorPerformance?.vendor_id})</span>
+            </div>
             <Button variant="danger" size="sm" onClick={() => { handleDeleteVendor(viewVendorPerformance.id); setViewVendorPerformance(null); }}>
               Delete Vendor
             </Button>
@@ -565,47 +568,68 @@ const VendorManagement = () => {
 
           return (
             <div className="space-y-6 mt-4">
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                <div className="bg-primary/10 p-4 rounded-[12px] border border-primary/20">
-                  <p className="text-sm text-primary font-semibold mb-1">Total Referrals</p>
+              <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+                <div className="bg-card border border-border/60 rounded-xl p-5 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+                  <div className="absolute top-4 right-4 bg-primary/10 p-2 rounded-lg text-primary group-hover:scale-110 transition-transform">
+                    <Users className="w-5 h-5" />
+                  </div>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">Total Referrals</p>
                   <p className="text-2xl font-bold text-foreground">{totalReferred}</p>
                 </div>
-                <div className="bg-success/10 p-4 rounded-[12px] border border-success/20">
-                  <p className="text-sm text-success font-semibold mb-1">Monthly Referrals</p>
+                <div className="bg-card border border-border/60 rounded-xl p-5 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+                  <div className="absolute top-4 right-4 bg-[#0B1B52]/10 p-2 rounded-lg text-[#0B1B52] group-hover:scale-110 transition-transform">
+                    <Calendar className="w-5 h-5" />
+                  </div>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">Monthly</p>
                   <p className="text-2xl font-bold text-foreground">{monthlyStudents}</p>
                 </div>
-                <div className="bg-warning/10 p-4 rounded-[12px] border border-warning/20">
-                  <p className="text-sm text-warning font-semibold mb-1">Today's Referrals</p>
+                <div className="bg-card border border-border/60 rounded-xl p-5 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+                  <div className="absolute top-4 right-4 bg-warning/10 p-2 rounded-lg text-warning group-hover:scale-110 transition-transform">
+                    <Clock className="w-5 h-5" />
+                  </div>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">Today's</p>
                   <p className="text-2xl font-bold text-foreground">{todaysStudents}</p>
                 </div>
-                <div className="bg-[#0B1B52]/10 p-4 rounded-[12px] border border-[#0B1B52]/20">
-                  <p className="text-sm text-[#0B1B52] font-semibold mb-1">Approved Students</p>
+                <div className="bg-card border border-border/60 rounded-xl p-5 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+                  <div className="absolute top-4 right-4 bg-success/10 p-2 rounded-lg text-success group-hover:scale-110 transition-transform">
+                    <CheckCircle className="w-5 h-5" />
+                  </div>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">Approved</p>
                   <p className="text-2xl font-bold text-foreground">{approvedCount}</p>
                 </div>
-                <div className="bg-[#10B981]/10 p-4 rounded-[12px] border border-[#10B981]/20">
-                  <p className="text-sm text-[#10B981] font-semibold mb-1">Total Earnings</p>
+                <div className="bg-card border border-[#10B981]/30 rounded-xl p-5 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+                  <div className="absolute top-4 right-4 bg-[#10B981]/10 p-2 rounded-lg text-[#10B981] group-hover:scale-110 transition-transform">
+                    <IndianRupee className="w-5 h-5" />
+                  </div>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">Total Earnings</p>
                   <p className="text-2xl font-bold text-foreground">₹{totalEarnings}</p>
                 </div>
               </div>
 
-              <div className="bg-card border border-border rounded-[12px] p-4">
-                <h4 className="font-semibold mb-4 text-foreground">Monthly Performance</h4>
+              <div className="bg-card border border-border/60 rounded-xl p-5 shadow-sm">
+                <h4 className="font-semibold mb-6 text-foreground flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5 text-primary" />
+                  Monthly Performance
+                </h4>
                 <ResponsiveContainer width="100%" height={250}>
                   <BarChart data={vendorChartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                    <XAxis dataKey="month" stroke="#6B7280" />
-                    <YAxis stroke="#6B7280" />
+                    <XAxis dataKey="month" stroke="#6B7280" fontSize={12} tickLine={false} axisLine={false} />
+                    <YAxis stroke="#6B7280" fontSize={12} tickLine={false} axisLine={false} />
                     <Tooltip cursor={{ fill: 'rgba(0,0,0,0.05)' }} />
                     <Bar dataKey="students" fill="#FF6B00" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
 
-              <div className="mt-6">
-                <h4 className="font-semibold mb-4 text-foreground">Referred Students List</h4>
-                <div className="overflow-x-auto border border-border rounded-[12px]">
+              <div className="mt-8 bg-card border border-border/60 rounded-xl shadow-sm overflow-hidden">
+                <div className="px-6 py-4 border-b border-border/60 bg-muted/10 flex justify-between items-center">
+                  <h4 className="font-semibold text-foreground">Referred Students List</h4>
+                  <span className="text-xs font-bold bg-primary/10 text-primary px-3 py-1 rounded-full">{vendorStudents.length} Records</span>
+                </div>
+                <div className="overflow-x-auto">
                   <table className="w-full text-sm">
-                    <thead className="bg-muted/20">
+                    <thead className="bg-muted/30">
                       <tr className="border-b border-border">
                         <th className="text-left py-3 px-4 font-semibold text-foreground">Student Name</th>
                         <th className="text-left py-3 px-4 font-semibold text-foreground">Phone</th>
