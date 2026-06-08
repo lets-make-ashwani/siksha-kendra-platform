@@ -9,6 +9,9 @@ const leadSchema = z.object({
   email: z.string().email(),
   address: z.string().optional(),
   class: z.string().optional(),
+  school_name: z.string().optional(),
+  parent_name: z.string().optional(),
+  parent_phone: z.string().optional(),
   course_id: z.string(),
   referral_code: z.string().optional(),
 });
@@ -23,10 +26,17 @@ export const submitLead = async (req: Request, res: Response): Promise<any> => {
       if (vendor && vendor.status === 'ACTIVE') vendorId = vendor.id;
     }
 
+    // Generate a unique sequential enrollment ID
+    const studentCount = await prisma.studentLead.count();
+    const enrollment_id = `ENR${String(studentCount + 1).padStart(6, '0')}`;
+
     const lead = await prisma.studentLead.create({
       data: {
+        enrollment_id,
         name: data.name, phone: data.phone, email: data.email,
         address: data.address, class: data.class,
+        school_name: data.school_name, parent_name: data.parent_name,
+        parent_phone: data.parent_phone,
         course_id: data.course_id, vendor_id: vendorId,
       }
     });

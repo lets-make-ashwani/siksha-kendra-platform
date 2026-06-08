@@ -54,6 +54,9 @@ export default function StudentRegistration() {
         phone: formData.mobile,
         address: formData.address,
         class: formData.class,
+        school_name: formData.schoolName,
+        parent_name: formData.parentName,
+        parent_phone: formData.parentContact,
         course_id: formData.course,
         referral_code: referralCode || undefined
       };

@@ -116,7 +116,23 @@ export const getAdminStats = async (req: Request, res: Response): Promise<any> =
       where: { created_at: { gte: startOfMonth } }
     });
 
-    res.json({ totalVendors, pendingVendors, totalStudents, monthlyStudents });
+    // Generate dynamic chart data for the current year
+    const currentYear = new Date().getFullYear();
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const chartData = [];
+    const currentMonth = new Date().getMonth();
+    
+    for (let i = 0; i <= currentMonth; i++) {
+      const startDate = new Date(currentYear, i, 1);
+      const endDate = new Date(currentYear, i + 1, 1);
+      
+      const students = await prisma.studentLead.count({ where: { created_at: { gte: startDate, lt: endDate } } });
+      const vendors = await prisma.vendor.count({ where: { created_at: { gte: startDate, lt: endDate } } });
+      
+      chartData.push({ month: months[i], students, vendors });
+    }
+
+    res.json({ totalVendors, pendingVendors, totalStudents, monthlyStudents, chartData });
   } catch (error: any) {
     res.status(500).json({ message: error.message || 'Internal Server Error' });
   }

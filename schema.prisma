@@ -125,6 +125,7 @@ model Course {
 
 model StudentLead {
   id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  enrollment_id   String?  @unique // e.g., ENR000001
   vendor_id       String?  @db.ObjectId
   vendor          Vendor?  @relation(fields: [vendor_id], references: [id], onDelete: SetNull)
   course_id       String   @db.ObjectId

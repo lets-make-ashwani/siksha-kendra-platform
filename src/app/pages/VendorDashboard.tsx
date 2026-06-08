@@ -8,6 +8,7 @@ import Card from '../components/Card';
 import Button from '../components/Button';
 import { toast } from 'sonner';
 import { Toaster } from 'sonner';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
 
 const sidebarItems = [
   { icon: BarChart3, label: 'Dashboard', path: '/dashboard' },
@@ -25,6 +26,8 @@ const Dashboard = () => {
   });
   const [recentStudents, setRecentStudents] = useState<any[]>([]);
   const [showQR, setShowQR] = useState(false);
+  const [chartData, setChartData] = useState<any[]>([]);
+  const [viewStudent, setViewStudent] = useState<any>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,6 +46,21 @@ const Dashboard = () => {
         if (studentsRes.ok) {
           const allStudents = await studentsRes.json();
           setRecentStudents(allStudents.slice(0, 5)); // Only show latest 5
+          
+          // Generate dynamic chart data based on student enrollments
+          const currentYear = new Date().getFullYear();
+          const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+          const counts = new Array(12).fill(0);
+          
+          allStudents.forEach((student: any) => {
+            const date = new Date(student.created_at);
+            if (date.getFullYear() === currentYear) {
+              counts[date.getMonth()] += 1;
+            }
+          });
+          
+          const currentMonth = new Date().getMonth();
+          setChartData(months.slice(0, currentMonth + 1).map((month, idx) => ({ month, students: counts[idx] })));
         }
       } catch (error) { console.error("Error loading vendor data:", error); }
     };
@@ -50,15 +68,6 @@ const Dashboard = () => {
   }, []);
 
   const referralLink = `${window.location.origin}/enroll/${stats.referral_code}`;
-
-  const monthlyData = [
-    { month: 'Jan', students: 12 },
-    { month: 'Feb', students: 18 },
-    { month: 'Mar', students: 25 },
-    { month: 'Apr', students: 32 },
-    { month: 'May', students: 45 },
-    { month: 'Jun', students: 58 }
-  ];
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -155,7 +164,7 @@ const Dashboard = () => {
         <Card>
           <h3 className="text-lg font-semibold text-foreground mb-4">Monthly Enrollments</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={monthlyData}>
+            <BarChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
               <XAxis dataKey="month" stroke="#6B7280" />
               <YAxis stroke="#6B7280" />
@@ -185,7 +194,11 @@ const Dashboard = () => {
                  <tr><td colSpan={6} className="py-6 text-center text-muted-foreground">No students referred yet.</td></tr>
               ) : recentStudents.map((student, idx) => (
                 <tr key={idx} className="border-b border-border">
-                  <td className="py-3 px-4 text-foreground">{student.name}</td>
+                  <td className="py-3 px-4">
+                    <button onClick={() => setViewStudent(student)} className="text-primary font-medium hover:underline text-left focus:outline-none">
+                      {student.name}
+                    </button>
+                  </td>
                   <td className="py-3 px-4 text-muted-foreground">{student.phone}</td>
                   <td className="py-3 px-4 text-muted-foreground">{student.class || '-'}</td>
                   <td className="py-3 px-4 text-muted-foreground">{student.course?.title || 'Unknown'}</td>
@@ -201,12 +214,38 @@ const Dashboard = () => {
           </table>
         </div>
       </Card>
+
+      <Dialog open={!!viewStudent} onOpenChange={(open) => !open && setViewStudent(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Student Details</DialogTitle>
+          </DialogHeader>
+          {viewStudent && (
+            <div className="space-y-6 mt-4">
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <p><strong>Enrollment ID:</strong> {viewStudent.enrollment_id || '-'}</p>
+                <p><strong>Name:</strong> {viewStudent.name}</p>
+                <p><strong>Email:</strong> {viewStudent.email}</p>
+                <p><strong>Phone:</strong> {viewStudent.phone}</p>
+                <p><strong>Class:</strong> {viewStudent.class || '-'}</p>
+                <p><strong>Course:</strong> {viewStudent.course?.title || '-'}</p>
+                <p><strong>Address:</strong> {viewStudent.address || '-'}</p>
+                <p><strong>School Name:</strong> {viewStudent.school_name || '-'}</p>
+                <p><strong>Parent Name:</strong> {viewStudent.parent_name || '-'}</p>
+                <p><strong>Parent Phone:</strong> {viewStudent.parent_phone || '-'}</p>
+                <p><strong>Enrolled Date:</strong> {new Date(viewStudent.created_at).toLocaleString()}</p>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
 
 const StudentList = () => {
   const [students, setStudents] = useState<any[]>([]);
+  const [viewStudent, setViewStudent] = useState<any>(null);
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -252,7 +291,11 @@ const StudentList = () => {
                  <tr><td colSpan={7} className="py-6 text-center text-muted-foreground">No students referred yet.</td></tr>
             ) : students.map((student) => (
               <tr key={student.id} className="border-b border-border hover:bg-muted/50 transition-colors">
-                <td className="py-3 px-4 text-foreground">{student.name}</td>
+                <td className="py-3 px-4">
+                  <button onClick={() => setViewStudent(student)} className="text-primary font-medium hover:underline text-left focus:outline-none">
+                    {student.name}
+                  </button>
+                </td>
                 <td className="py-3 px-4 text-muted-foreground">{student.email}</td>
                 <td className="py-3 px-4 text-muted-foreground">{student.phone}</td>
                 <td className="py-3 px-4 text-muted-foreground">{student.class || '-'}</td>
@@ -269,6 +312,31 @@ const StudentList = () => {
         </table>
       </div>
     </Card>
+
+    <Dialog open={!!viewStudent} onOpenChange={(open) => !open && setViewStudent(null)}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>Student Details</DialogTitle>
+        </DialogHeader>
+        {viewStudent && (
+          <div className="space-y-6 mt-4">
+            <div className="grid grid-cols-2 gap-4 text-sm">
+                <p><strong>Enrollment ID:</strong> {viewStudent.enrollment_id || '-'}</p>
+              <p><strong>Name:</strong> {viewStudent.name}</p>
+              <p><strong>Email:</strong> {viewStudent.email}</p>
+              <p><strong>Phone:</strong> {viewStudent.phone}</p>
+              <p><strong>Class:</strong> {viewStudent.class || '-'}</p>
+              <p><strong>Course:</strong> {viewStudent.course?.title || '-'}</p>
+              <p><strong>Address:</strong> {viewStudent.address || '-'}</p>
+              <p><strong>School Name:</strong> {viewStudent.school_name || '-'}</p>
+              <p><strong>Parent Name:</strong> {viewStudent.parent_name || '-'}</p>
+              <p><strong>Parent Phone:</strong> {viewStudent.parent_phone || '-'}</p>
+              <p><strong>Enrolled Date:</strong> {new Date(viewStudent.created_at).toLocaleString()}</p>
+            </div>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
   </div>
 )};
 

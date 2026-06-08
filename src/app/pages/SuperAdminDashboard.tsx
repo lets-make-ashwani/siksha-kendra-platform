@@ -23,7 +23,8 @@ const Dashboard = () => {
     totalVendors: 0,
     pendingVendors: 0,
     totalStudents: 0,
-    monthlyStudents: 0
+    monthlyStudents: 0,
+    chartData: []
   });
   const [pendingApps, setPendingApps] = useState<any[]>([]);
   const [viewApp, setViewApp] = useState<any>(null);
@@ -80,15 +81,6 @@ const Dashboard = () => {
     }
   };
 
-  const monthlyData = [
-    { month: 'Jan', students: 400, vendors: 20 },
-    { month: 'Feb', students: 550, vendors: 35 },
-    { month: 'Mar', students: 720, vendors: 48 },
-    { month: 'Apr', students: 890, vendors: 62 },
-    { month: 'May', students: 1100, vendors: 75 },
-    { month: 'Jun', students: 1350, vendors: 92 }
-  ];
-
   return (
     <div className="p-6">
       <div className="mb-8">
@@ -109,7 +101,7 @@ const Dashboard = () => {
         <Card>
           <h3 className="text-lg font-semibold text-foreground mb-4">Monthly Student Registrations</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={monthlyData}>
+            <LineChart data={stats.chartData || []}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
               <XAxis dataKey="month" stroke="#6B7280" />
               <YAxis stroke="#6B7280" />
@@ -122,7 +114,7 @@ const Dashboard = () => {
         <Card>
           <h3 className="text-lg font-semibold text-foreground mb-4">Vendor Growth</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={monthlyData}>
+            <BarChart data={stats.chartData || []}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
               <XAxis dataKey="month" stroke="#6B7280" />
               <YAxis stroke="#6B7280" />
@@ -431,7 +423,11 @@ const VendorManagement = () => {
             ) : vendors.map((vendor) => (
               <tr key={vendor.id} className="border-b border-border hover:bg-muted/50 transition-colors">
                 <td className="py-3 px-4 text-foreground">{vendor.vendor_id}</td>
-                <td className="py-3 px-4 text-foreground">{vendor.user?.name}</td>
+                <td className="py-3 px-4">
+                  <button onClick={() => setViewVendor(vendor)} className="text-primary font-medium hover:underline text-left focus:outline-none">
+                    {vendor.user?.name}
+                  </button>
+                </td>
                 <td className="py-3 px-4 text-muted-foreground">{vendor.user?.email}</td>
                 <td className="py-3 px-4 text-muted-foreground">{vendor.user?.phone}</td>
                 <td className="py-3 px-4 text-foreground">{vendor._count?.studentLeads || 0}</td>
@@ -547,6 +543,7 @@ const VendorManagement = () => {
 
 const StudentManagement = () => {
   const [students, setStudents] = useState<any[]>([]);
+  const [viewStudent, setViewStudent] = useState<any>(null);
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -594,8 +591,12 @@ const StudentManagement = () => {
                 </tr>
             ) : students.map((student) => (
               <tr key={student.id} className="border-b border-border hover:bg-muted/50 transition-colors">
-                <td className="py-3 px-4 text-foreground font-mono">...{student.id.slice(-5)}</td>
-                <td className="py-3 px-4 text-foreground">{student.name}</td>
+                <td className="py-3 px-4 text-foreground font-mono">{student.enrollment_id || 'N/A'}</td>
+                <td className="py-3 px-4">
+                  <button onClick={() => setViewStudent(student)} className="text-primary font-medium hover:underline text-left focus:outline-none">
+                    {student.name}
+                  </button>
+                </td>
                 <td className="py-3 px-4 text-muted-foreground">{student.vendor?.user?.name || 'Direct Enrollment'}</td>
                 <td className="py-3 px-4 text-muted-foreground">{student.course?.title || 'Unknown Course'}</td>
                 <td className="py-3 px-4 text-muted-foreground">{student.class || '-'}</td>
@@ -611,6 +612,32 @@ const StudentManagement = () => {
         </table>
       </div>
     </Card>
+
+    <Dialog open={!!viewStudent} onOpenChange={(open) => !open && setViewStudent(null)}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>Student Details</DialogTitle>
+        </DialogHeader>
+        {viewStudent && (
+          <div className="space-y-6 mt-4">
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <p><strong>Enrollment ID:</strong> {viewStudent.enrollment_id || '-'}</p>
+              <p><strong>Name:</strong> {viewStudent.name}</p>
+              <p><strong>Email:</strong> {viewStudent.email}</p>
+              <p><strong>Phone:</strong> {viewStudent.phone}</p>
+              <p><strong>Class:</strong> {viewStudent.class || '-'}</p>
+              <p><strong>Course:</strong> {viewStudent.course?.title || '-'}</p>
+              <p><strong>Vendor:</strong> {viewStudent.vendor?.user?.name || 'Direct Enrollment'}</p>
+              <p><strong>Address:</strong> {viewStudent.address || '-'}</p>
+              <p><strong>School Name:</strong> {viewStudent.school_name || '-'}</p>
+              <p><strong>Parent Name:</strong> {viewStudent.parent_name || '-'}</p>
+              <p><strong>Parent Phone:</strong> {viewStudent.parent_phone || '-'}</p>
+              <p><strong>Enrolled Date:</strong> {new Date(viewStudent.created_at).toLocaleString()}</p>
+            </div>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
   </div>
 )};
 
