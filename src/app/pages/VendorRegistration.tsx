@@ -78,7 +78,7 @@ export default function VendorRegistration() {
           </div>
           <h1 className="text-3xl font-bold text-foreground mb-4">Application Submitted!</h1>
           <p className="text-muted-foreground mb-6">
-            Thank you for your interest in becoming a Topper's Siksha Kendra vendor. Your application is currently under review.
+            Thank you for your interest in becoming a Topper's Shiksha Kendra vendor. Your application is currently under review.
           </p>
           <div className="bg-primary-light p-6 rounded-[12px] mb-6">
             <h3 className="font-semibold text-foreground mb-3">What's Next?</h3>
@@ -109,11 +109,11 @@ export default function VendorRegistration() {
           <div className="flex items-center justify-center gap-2 mb-4">
             <img src="/TKS.png" alt="Topper's Siksha Kendra Logo" className="w-12 h-12 object-contain" />
             <span className="text-2xl font-bold text-foreground">
-              Topper<span className="text-primary">'s</span> Siksha <span className="text-primary">Kendra</span>
+              Topper<span className="text-primary">'s</span> Shiksha <span className="text-primary">Kendra</span>
             </span>
           </div>
           <h1 className="text-4xl font-bold text-foreground mb-3">
-            Become a Topper<span className="text-primary">'s</span> Siksha <span className="text-primary">Kendra</span> Vendor
+            Become a Topper<span className="text-primary">'s</span> Shiksha <span className="text-primary">Kendra</span> Vendor
           </h1>
           <p className="text-lg text-muted-foreground">Join our network of trusted educational partners</p>
         </div>

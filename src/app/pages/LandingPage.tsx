@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { GraduationCap, BookOpen, Users, Award, TrendingUp, CheckCircle, Star, MessageCircle } from 'lucide-react';
+import { GraduationCap, BookOpen, Users, Award, TrendingUp, CheckCircle, Star } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
@@ -98,7 +98,7 @@ export default function LandingPage() {
           <div className="text-center mb-12">
             <p className="text-primary font-semibold mb-2">WHY CHOOSE US</p>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-              Why Choose Topper<span className="text-primary">'s</span> Siksha <span className="text-primary">Kendra</span>
+              Why Choose Topper<span className="text-primary">'s</span> Shiksha <span className="text-primary">Kendra</span>
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -170,7 +170,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               { name: 'Rahul Sharma', role: 'JEE Student', text: 'The courses are excellent and the teachers are very supportive. I cleared JEE Advanced with a great rank!' },
-              { name: 'Priya Patel', role: 'NEET Student', text: 'Topper\'s Siksha Kendra helped me achieve my dream of becoming a doctor. The study material and tests were top-notch.' },
+              { name: 'Priya Patel', role: 'NEET Student', text: 'Topper\'s Shiksha Kendra helped me achieve my dream of becoming a doctor. The study material and tests were top-notch.' },
               { name: 'Amit Kumar', role: 'CBSE Student', text: 'I improved my grades significantly with the help of amazing teachers and comprehensive content.' }
             ].map((testimonial, idx) => (
               <Card key={idx}>
@@ -224,7 +224,7 @@ export default function LandingPage() {
             Ready to Start Your Learning Journey?
           </h2>
           <p className="text-lg text-muted-foreground mb-8">
-            Join thousands of students who are achieving their academic goals with Topper<span className="text-primary">'s</span> Siksha <span className="text-primary">Kendra</span>.
+            Join thousands of students who are achieving their academic goals with Topper<span className="text-primary">'s</span> Shiksha <span className="text-primary">Kendra</span>.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link to="/courses">

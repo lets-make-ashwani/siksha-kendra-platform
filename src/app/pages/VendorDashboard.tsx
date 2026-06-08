@@ -1,13 +1,12 @@
 import { Routes, Route, Navigate, useNavigate } from 'react-router';
 import { useState, useEffect } from 'react';
-import { BarChart3, Users, UserCheck, Clock, UserCircle, Settings, Copy, Share2, QrCode, LogOut, IndianRupee, BookOpen } from 'lucide-react';
+import { BarChart3, Users, Clock, UserCircle, Settings, Copy, Share2, QrCode, LogOut, IndianRupee, BookOpen } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import Sidebar from '../components/Sidebar';
 import StatCard from '../components/StatCard';
 import Card from '../components/Card';
 import Button from '../components/Button';
-import { toast } from 'sonner';
-import { Toaster } from 'sonner';
+import { toast, Toaster } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
 
 const sidebarItems = [
@@ -81,12 +80,12 @@ const Dashboard = () => {
   };
 
   const shareOnWhatsApp = () => {
-    const message = encodeURIComponent(`Join Topper's Siksha Kendra through my referral link: ${referralLink}`);
+    const message = encodeURIComponent(`Join Topper's Shiksha Kendra through my referral link: ${referralLink}`);
     window.open(`https://wa.me/?text=${message}`, '_blank');
   };
 
   const shareOnTelegram = () => {
-    const message = encodeURIComponent(`Join Topper's Siksha Kendra through my referral link: ${referralLink}`);
+    const message = encodeURIComponent(`Join Topper's Shiksha Kendra through my referral link: ${referralLink}`);
     window.open(`https://t.me/share/url?url=${referralLink}&text=${message}`, '_blank');
   };
 

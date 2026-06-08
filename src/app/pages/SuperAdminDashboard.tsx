@@ -92,7 +92,7 @@ const Dashboard = () => {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-foreground mb-2">Super Admin Dashboard</h1>
         <p className="text-muted-foreground">
-          Welcome back! Here's what's happening with Topper<span className="text-primary">'s</span> Siksha <span className="text-primary">Kendra</span> today.
+          Welcome back! Here's what's happening with Topper<span className="text-primary">'s</span> Shiksha <span className="text-primary">Kendra</span> today.
         </p>
       </div>
 

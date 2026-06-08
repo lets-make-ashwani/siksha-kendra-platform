@@ -109,7 +109,7 @@ export default function StudentRegistration() {
           </div>
           <h1 className="text-3xl font-bold text-foreground mb-4">Registration Successful!</h1>
           <p className="text-muted-foreground mb-6">
-            Thank you for registering with Topper's Siksha Kendra. We have received your application and will contact you shortly.
+            Thank you for registering with Topper's Shiksha Kendra. We have received your application and will contact you shortly.
           </p>
           <Button onClick={() => window.location.href = '/'}>Back to Home</Button>
         </Card>
