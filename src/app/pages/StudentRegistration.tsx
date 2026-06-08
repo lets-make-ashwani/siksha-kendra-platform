@@ -100,10 +100,6 @@ export default function StudentRegistration() {
           <p className="text-muted-foreground mb-6">
             Thank you for registering with Topper's Siksha Kendra. We have received your application and will contact you shortly.
           </p>
-          <div className="bg-primary-light p-4 rounded-[12px] mb-6">
-            <p className="text-sm text-muted-foreground mb-1">Your Referral Code</p>
-            <p className="text-2xl font-bold text-primary">{referralCode}</p>
-          </div>
           <Button onClick={() => window.location.href = '/'}>Back to Home</Button>
         </Card>
       </div>
