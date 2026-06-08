@@ -335,6 +335,8 @@ const VendorManagement = () => {
   const [loading, setLoading] = useState(false);
   const [viewVendorPerformance, setViewVendorPerformance] = useState<any>(null);
   const [viewVendorDetails, setViewVendorDetails] = useState<any>(null);
+  const [isEditingCommission, setIsEditingCommission] = useState(false);
+  const [editCommissionValue, setEditCommissionValue] = useState('');
   const [newVendorCreds, setNewVendorCreds] = useState<any>(null);
   const [formData, setFormData] = useState({
     name: '', email: '', phone: '', address: '', city: '', state: '', pincode: ''
@@ -382,6 +384,35 @@ const VendorManagement = () => {
       }
     } catch (err) {
       toast.error('Error deleting vendor');
+    }
+  };
+
+  const handleUpdateCommission = async (id: string) => {
+    try {
+      const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const apiUrl = rawApiUrl.replace(/\/$/, '');
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch(`${apiUrl}/api/admin/vendors/${id}/commission`, {
+        method: 'PATCH',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify({ commission_rate: editCommissionValue })
+      });
+      
+      if (response.ok) {
+        toast.success('Commission rate updated successfully');
+        setIsEditingCommission(false);
+        setViewVendorDetails({ ...viewVendorDetails, commission_rate: parseFloat(editCommissionValue) || 0 });
+        fetchVendors(); // Refresh the main table
+      } else {
+        const data = await response.json();
+        toast.error(data.message || 'Failed to update commission');
+      }
+    } catch (error) {
+      toast.error('Error updating commission');
     }
   };
 
@@ -758,7 +789,7 @@ const VendorManagement = () => {
       </DialogContent>
     </Dialog>
 
-    <Dialog open={!!viewVendorDetails} onOpenChange={(open) => !open && setViewVendorDetails(null)}>
+    <Dialog open={!!viewVendorDetails} onOpenChange={(open) => { if (!open) { setViewVendorDetails(null); setIsEditingCommission(false); }}}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex justify-between items-center pr-6">
@@ -782,7 +813,26 @@ const VendorManagement = () => {
               <p><strong>Bank:</strong> {viewVendorDetails.bank_name} ({viewVendorDetails.branch_name})</p>
               <p><strong>Account No:</strong> {viewVendorDetails.account_number}</p>
               <p><strong>IFSC:</strong> {viewVendorDetails.ifsc_code}</p>
-              <p><strong>Commission Rate:</strong> ₹{viewVendorDetails.commission_rate || 0} per referral</p>
+              <div className="flex items-center gap-2">
+                <strong>Commission Rate:</strong> 
+                {isEditingCommission ? (
+                  <div className="flex items-center gap-2">
+                    <input 
+                      type="number" 
+                      value={editCommissionValue} 
+                      onChange={(e) => setEditCommissionValue(e.target.value)} 
+                      className="w-24 px-2 py-1 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-background text-foreground"
+                    />
+                    <Button size="sm" onClick={() => handleUpdateCommission(viewVendorDetails.id)}>Save</Button>
+                    <Button size="sm" variant="outline" onClick={() => setIsEditingCommission(false)}>Cancel</Button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span>₹{viewVendorDetails.commission_rate || 0} per referral</span>
+                    <button onClick={() => { setEditCommissionValue(viewVendorDetails.commission_rate?.toString() || '0'); setIsEditingCommission(true); }} className="text-primary text-xs font-medium hover:underline">Edit</button>
+                  </div>
+                )}
+              </div>
             </div>
             
             <div className="bg-warning/10 border border-warning/20 p-4 rounded-[8px]">

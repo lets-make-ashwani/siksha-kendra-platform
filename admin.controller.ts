@@ -312,3 +312,18 @@ export const updateStudentStatus = async (req: Request, res: Response): Promise<
     res.status(500).json({ message: error.message || 'Error updating student status' });
   }
 };
+
+export const updateVendorCommission = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { id } = req.params;
+    const { commission_rate } = req.body;
+    
+    const vendor = await prisma.vendor.update({
+      where: { id },
+      data: { commission_rate: commission_rate ? parseFloat(commission_rate) : 0 }
+    });
+    res.json({ message: 'Commission rate updated successfully', vendor });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message || 'Error updating commission rate' });
+  }
+};

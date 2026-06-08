@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { inviteVendor, getAdminStats, getPendingApplications, approveApplication, rejectApplication, getAllVendors, deleteVendor, updateStudentStatus } from './admin.controller';
+import { inviteVendor, getAdminStats, getPendingApplications, approveApplication, rejectApplication, getAllVendors, deleteVendor, updateStudentStatus, updateVendorCommission } from './admin.controller';
 import { authenticate, authorize } from './auth.middleware';
 
 const router = Router();
@@ -11,6 +11,7 @@ router.get('/stats', getAdminStats);
 router.get('/vendors', getAllVendors);
 router.post('/vendors/invite', inviteVendor);
 router.delete('/vendors/:id', deleteVendor);
+router.patch('/vendors/:id/commission', updateVendorCommission);
 router.patch('/students/:id/status', updateStudentStatus);
 
 router.get('/applications/pending', getPendingApplications);
