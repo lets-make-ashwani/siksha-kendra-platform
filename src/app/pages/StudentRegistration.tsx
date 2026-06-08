@@ -88,7 +88,11 @@ export default function StudentRegistration() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    if (name === 'class') {
+    if (name === 'mobile' || name === 'parentContact') {
+      // Allow only numeric input and limit to 10 digits
+      const numericValue = value.replace(/\D/g, '');
+      setFormData(prev => ({ ...prev, [name]: numericValue.slice(0, 10) }));
+    } else if (name === 'class') {
       // If they change their class, reset their selected course to avoid mismatches
       setFormData(prev => ({ ...prev, [name]: value, course: '' }));
     } else {
@@ -167,7 +171,11 @@ export default function StudentRegistration() {
                   value={formData.mobile}
                   onChange={handleChange}
                   required
-                  placeholder="+91 98765 43210"
+                  placeholder="9876543210"
+                  maxLength={10}
+                  minLength={10}
+                  pattern="\d{10}"
+                  title="Mobile number must be exactly 10 digits"
                 />
                 <div>
                   <label className="block mb-2 text-foreground">Class</label>
@@ -228,7 +236,11 @@ export default function StudentRegistration() {
                   value={formData.parentContact}
                   onChange={handleChange}
                   required
-                  placeholder="+91 98765 43210"
+                  placeholder="9876543210"
+                  maxLength={10}
+                  minLength={10}
+                  pattern="\d{10}"
+                  title="Parent contact must be exactly 10 digits"
                 />
               </div>
             </div>

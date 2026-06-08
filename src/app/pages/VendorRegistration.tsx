@@ -54,19 +54,20 @@ export default function VendorRegistration() {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.type === 'file') {
-      const file = e.target.files?.[0];
+    const { name, value, type, files } = e.target;
+    if (type === 'file') {
+      const file = files?.[0];
       if (file) {
         const reader = new FileReader();
-        reader.onloadend = () => setFormData({ ...formData, [e.target.name]: reader.result as string });
+        reader.onloadend = () => setFormData({ ...formData, [name]: reader.result as string });
         reader.readAsDataURL(file);
       }
-      return;
+    } else if (name === 'phone') {
+      const numericValue = value.replace(/\D/g, '');
+      setFormData({ ...formData, [name]: numericValue.slice(0, 10) });
+    } else {
+      setFormData({ ...formData, [name]: value });
     }
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
   };
 
   if (submitted) {
@@ -188,7 +189,11 @@ export default function VendorRegistration() {
                     value={formData.phone}
                     onChange={handleChange}
                     required
-                    placeholder="+91 98765 43210"
+                    placeholder="9876543210"
+                    maxLength={10}
+                    minLength={10}
+                    pattern="\d{10}"
+                    title="Phone number must be exactly 10 digits"
                   />
                 </div>
               </div>
