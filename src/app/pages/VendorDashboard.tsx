@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate, useNavigate } from 'react-router';
 import { useState, useEffect } from 'react';
-import { BarChart3, Users, UserCheck, Clock, UserCircle, Settings, Copy, Share2, QrCode, LogOut } from 'lucide-react';
+import { BarChart3, Users, UserCheck, Clock, UserCircle, Settings, Copy, Share2, QrCode, LogOut, IndianRupee } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import Sidebar from '../components/Sidebar';
 import StatCard from '../components/StatCard';
@@ -28,6 +28,7 @@ const Dashboard = () => {
   const [showQR, setShowQR] = useState(false);
   const [chartData, setChartData] = useState<any[]>([]);
   const [viewStudent, setViewStudent] = useState<any>(null);
+  const [totalEarnings, setTotalEarnings] = useState<number>(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,7 +53,11 @@ const Dashboard = () => {
           const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
           const counts = new Array(12).fill(0);
           
+          let earnings = 0;
           allStudents.forEach((student: any) => {
+            if (student.status === 'APPROVED') {
+              earnings += (student.vendor?.commission_rate || 0);
+            }
             const date = new Date(student.created_at);
             if (date.getFullYear() === currentYear) {
               counts[date.getMonth()] += 1;
@@ -61,6 +66,7 @@ const Dashboard = () => {
           
           const currentMonth = new Date().getMonth();
           setChartData(months.slice(0, currentMonth + 1).map((month, idx) => ({ month, students: counts[idx] })));
+          setTotalEarnings(earnings);
         }
       } catch (error) { console.error("Error loading vendor data:", error); }
     };
@@ -97,6 +103,7 @@ const Dashboard = () => {
         <StatCard title="Total Referrals" value={stats.totalStudents} icon={Users} color="primary" />
         <StatCard title="Monthly Referrals" value={stats.monthlyStudents} icon={BarChart3} color="success" />
         <StatCard title="Today's Referrals" value={stats.todaysStudents} icon={Clock} color="warning" />
+        <StatCard title="Total Earnings" value={`₹${totalEarnings}`} icon={IndianRupee} color="success" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">

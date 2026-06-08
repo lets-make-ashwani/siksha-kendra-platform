@@ -31,6 +31,7 @@ const Dashboard = () => {
   const [newVendorCreds, setNewVendorCreds] = useState<any>(null);
   const [confirmApproveId, setConfirmApproveId] = useState<string | null>(null);
   const [fullScreenImage, setFullScreenImage] = useState<string | null>(null);
+  const [commissionRate, setCommissionRate] = useState<string>('');
 
   const fetchDashboardData = async () => {
       try {
@@ -56,7 +57,7 @@ const Dashboard = () => {
     fetchDashboardData();
   }, []);
 
-  const handleAction = async (id: string, action: 'approve' | 'reject') => {
+  const handleAction = async (id: string, action: 'approve' | 'reject', payload?: any) => {
     try {
       const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
       const apiUrl = rawApiUrl.replace(/\/$/, '');
@@ -64,7 +65,11 @@ const Dashboard = () => {
       
       const response = await fetch(`${apiUrl}/api/admin/applications/${id}/${action}`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: payload ? JSON.stringify(payload) : undefined
       });
       
       const data = await response.json();
@@ -272,7 +277,7 @@ const Dashboard = () => {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={!!confirmApproveId} onOpenChange={(open) => !open && setConfirmApproveId(null)}>
+      <Dialog open={!!confirmApproveId} onOpenChange={(open) => { if(!open) { setConfirmApproveId(null); setCommissionRate(''); }}}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Confirm Vendor Approval</DialogTitle>
@@ -282,14 +287,27 @@ const Dashboard = () => {
               Are you sure you want to approve this application?
             </p>
             <p className="text-muted-foreground">
-              This action will create a new vendor account, generate secure login credentials, and automatically send an approval email to the applicant.
+              This action will create a new vendor account, generate secure login credentials, and automatically send an approval email to the applicant. Please set their referral commission below.
             </p>
+            <div className="mt-4">
+              <Input 
+                label="Commission Per Referral (₹)" 
+                type="number" 
+                value={commissionRate} 
+                onChange={(e) => setCommissionRate(e.target.value)} 
+                placeholder="e.g. 500" 
+                required
+              />
+            </div>
             <div className="flex justify-end gap-3 mt-6">
-              <Button type="button" variant="outline" onClick={() => setConfirmApproveId(null)}>Cancel</Button>
+              <Button type="button" variant="outline" onClick={() => { setConfirmApproveId(null); setCommissionRate(''); }}>Cancel</Button>
               <Button type="button" onClick={() => {
-                if (confirmApproveId) {
-                  handleAction(confirmApproveId, 'approve');
+                if (confirmApproveId && commissionRate) {
+                  handleAction(confirmApproveId, 'approve', { commission_rate: commissionRate });
                   setConfirmApproveId(null);
+                  setCommissionRate('');
+                } else if (!commissionRate) {
+                  toast.error('Please enter a commission rate');
                 }
               }}>Yes, Approve Vendor</Button>
             </div>
@@ -519,6 +537,7 @@ const VendorManagement = () => {
           const totalReferred = vendorStudents.length;
           const approvedCount = vendorStudents.filter((s: any) => s.status === 'APPROVED').length;
           const pendingCount = vendorStudents.filter((s: any) => s.status !== 'APPROVED').length;
+          const totalEarnings = approvedCount * (viewVendorPerformance.commission_rate || 0);
           
           const currentYear = new Date().getFullYear();
           const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -546,7 +565,7 @@ const VendorManagement = () => {
 
           return (
             <div className="space-y-6 mt-4">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 <div className="bg-primary/10 p-4 rounded-[12px] border border-primary/20">
                   <p className="text-sm text-primary font-semibold mb-1">Total Referrals</p>
                   <p className="text-2xl font-bold text-foreground">{totalReferred}</p>
@@ -562,6 +581,10 @@ const VendorManagement = () => {
                 <div className="bg-[#0B1B52]/10 p-4 rounded-[12px] border border-[#0B1B52]/20">
                   <p className="text-sm text-[#0B1B52] font-semibold mb-1">Approved Students</p>
                   <p className="text-2xl font-bold text-foreground">{approvedCount}</p>
+                </div>
+                <div className="bg-[#10B981]/10 p-4 rounded-[12px] border border-[#10B981]/20">
+                  <p className="text-sm text-[#10B981] font-semibold mb-1">Total Earnings</p>
+                  <p className="text-2xl font-bold text-foreground">₹{totalEarnings}</p>
                 </div>
               </div>
 
@@ -643,6 +666,7 @@ const VendorManagement = () => {
               <p><strong>Bank:</strong> {viewVendorDetails.bank_name} ({viewVendorDetails.branch_name})</p>
               <p><strong>Account No:</strong> {viewVendorDetails.account_number}</p>
               <p><strong>IFSC:</strong> {viewVendorDetails.ifsc_code}</p>
+              <p><strong>Commission Rate:</strong> ₹{viewVendorDetails.commission_rate || 0} per referral</p>
             </div>
             
             <div className="bg-warning/10 border border-warning/20 p-4 rounded-[8px]">

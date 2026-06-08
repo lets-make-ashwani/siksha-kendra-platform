@@ -91,6 +91,7 @@ model Vendor {
   account_number String?
   ifsc_code      String?
   passbook_image String?
+  commission_rate Float      @default(0)
   status         VendorStatus @default(ACTIVE)
   created_at     DateTime     @default(now())
   updated_at     DateTime     @updatedAt

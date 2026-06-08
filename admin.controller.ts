@@ -170,6 +170,7 @@ export const getPendingApplications = async (req: Request, res: Response): Promi
 export const approveApplication = async (req: Request, res: Response): Promise<any> => {
   try {
     const { id } = req.params;
+    const { commission_rate } = req.body;
     const application = await prisma.vendorApplication.findUnique({ where: { id } });
     
     if (!application || application.status !== 'PENDING') {
@@ -212,6 +213,7 @@ export const approveApplication = async (req: Request, res: Response): Promise<a
             account_number: application.account_number,
             ifsc_code: application.ifsc_code,
             passbook_image: application.passbook_image,
+            commission_rate: commission_rate ? parseFloat(commission_rate) : 0,
             status: 'ACTIVE'
           }
         }
