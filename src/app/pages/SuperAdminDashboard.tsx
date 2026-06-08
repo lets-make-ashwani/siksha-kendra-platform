@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate, useNavigate } from 'react-router';
 import { useState, useEffect } from 'react';
-import { Users, BookOpen, UserCheck, Bell, BarChart3, Settings, UserCircle, GraduationCap, CheckCircle, XCircle, Eye, LogOut, Calendar, Clock, IndianRupee, Wallet } from 'lucide-react';
+import { Users, BookOpen, UserCheck, Bell, BarChart3, Settings, UserCircle, GraduationCap, CheckCircle, XCircle, Eye, LogOut, Calendar, Clock, IndianRupee, Wallet, Copy, Percent } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import Sidebar from '../components/Sidebar';
 import StatCard from '../components/StatCard';
@@ -523,24 +523,42 @@ const VendorManagement = () => {
     </Dialog>
 
     <Dialog open={!!viewVendorPerformance} onOpenChange={(open) => !open && setViewVendorPerformance(null)}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex justify-between items-center pr-6">
-            <div className="flex flex-col gap-1">
-              <span className="text-xl">Performance Dashboard</span>
-              <span className="text-sm font-normal text-muted-foreground">Vendor: {viewVendorPerformance?.user?.name} ({viewVendorPerformance?.vendor_id})</span>
-            </div>
-            <Button variant="danger" size="sm" onClick={() => { handleDeleteVendor(viewVendorPerformance.id); setViewVendorPerformance(null); }}>
-              Delete Vendor
-            </Button>
-          </DialogTitle>
-        </DialogHeader>
+      <DialogContent className="max-w-[1200px] h-[90vh] p-0 flex flex-col gap-0 overflow-hidden bg-background border-border/50">
+        {/* STICKY PREMIUM HEADER */}
+        <div className="px-6 py-5 border-b border-border/60 bg-card flex flex-row items-center justify-between z-10 shadow-sm shrink-0">
+          <div className="flex items-center gap-4 text-left">
+             <div className="w-14 h-14 rounded-full bg-primary/10 text-primary flex items-center justify-center text-2xl font-bold border border-primary/20 shadow-sm">
+               {viewVendorPerformance?.user?.name?.charAt(0).toUpperCase()}
+             </div>
+             <div>
+               <DialogTitle className="text-2xl font-bold text-foreground flex items-center gap-3 m-0">
+                 {viewVendorPerformance?.user?.name}
+                 <span className={`px-2.5 py-0.5 text-[10px] uppercase tracking-wider rounded-full font-bold ${viewVendorPerformance?.status === 'ACTIVE' ? 'bg-success/15 text-success' : 'bg-destructive/15 text-destructive'}`}>
+                   {viewVendorPerformance?.status}
+                 </span>
+               </DialogTitle>
+               <p className="text-sm text-muted-foreground font-medium mt-1">
+                 Vendor ID: {viewVendorPerformance?.vendor_id} &bull; Joined {new Date(viewVendorPerformance?.created_at).toLocaleDateString()}
+               </p>
+             </div>
+          </div>
+          <div className="flex items-center gap-3 pr-8">
+             <Button variant="danger" onClick={() => { handleDeleteVendor(viewVendorPerformance.id); setViewVendorPerformance(null); }} className="shadow-sm">
+               <XCircle className="w-4 h-4 mr-2" />
+               Delete Vendor
+             </Button>
+          </div>
+        </div>
+        
+        {/* SCROLLABLE DASHBOARD CONTENT */}
+        <div className="flex-1 overflow-y-auto p-6 bg-muted/10">
         {viewVendorPerformance && (() => {
           const vendorStudents = viewVendorPerformance.studentLeads || [];
           const totalReferred = vendorStudents.length;
           const approvedCount = vendorStudents.filter((s: any) => s.status === 'APPROVED').length;
           const pendingCount = vendorStudents.filter((s: any) => s.status !== 'APPROVED').length;
           const totalEarnings = approvedCount * (viewVendorPerformance.commission_rate || 0);
+          const conversionRate = totalReferred > 0 ? ((approvedCount / totalReferred) * 100).toFixed(1) : '0.0';
           
           const currentYear = new Date().getFullYear();
           const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -567,93 +585,166 @@ const VendorManagement = () => {
           const vendorChartData = months.slice(0, currentMonth + 1).map((month, idx) => ({ month, students: counts[idx] }));
 
           return (
-            <div className="space-y-6 mt-4">
-              <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-                <div className="bg-card border border-border/60 rounded-xl p-5 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
-                  <div className="absolute top-4 right-4 bg-primary/10 p-2 rounded-lg text-primary group-hover:scale-110 transition-transform">
-                    <Users className="w-5 h-5" />
+            <div className="space-y-6 max-w-[1152px] mx-auto pb-4">
+              
+              {/* KPI CARDS (SaaS Style) */}
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                <div className="bg-card border border-border/60 rounded-xl p-5 shadow-sm relative overflow-hidden group hover:-translate-y-1 hover:shadow-md transition-all duration-300">
+                  <div className="flex justify-between items-start mb-2">
+                    <p className="text-sm font-medium text-muted-foreground">Total Referrals</p>
+                    <div className="bg-primary/10 p-2 rounded-lg text-primary group-hover:scale-110 transition-transform"><Users className="w-4 h-4" /></div>
                   </div>
-                  <p className="text-sm font-medium text-muted-foreground mb-1">Total Referrals</p>
-                  <p className="text-2xl font-bold text-foreground">{totalReferred}</p>
+                  <p className="text-3xl font-bold text-foreground">{totalReferred}</p>
                 </div>
-                <div className="bg-card border border-border/60 rounded-xl p-5 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
-                  <div className="absolute top-4 right-4 bg-[#0B1B52]/10 p-2 rounded-lg text-[#0B1B52] group-hover:scale-110 transition-transform">
-                    <Calendar className="w-5 h-5" />
+                
+                <div className="bg-card border border-border/60 rounded-xl p-5 shadow-sm relative overflow-hidden group hover:-translate-y-1 hover:shadow-md transition-all duration-300">
+                  <div className="flex justify-between items-start mb-2">
+                    <p className="text-sm font-medium text-muted-foreground">Monthly Referrals</p>
+                    <div className="bg-[#0B1B52]/10 p-2 rounded-lg text-[#0B1B52] group-hover:scale-110 transition-transform"><Calendar className="w-4 h-4" /></div>
                   </div>
-                  <p className="text-sm font-medium text-muted-foreground mb-1">Monthly</p>
-                  <p className="text-2xl font-bold text-foreground">{monthlyStudents}</p>
+                  <p className="text-3xl font-bold text-foreground">{monthlyStudents}</p>
                 </div>
-                <div className="bg-card border border-border/60 rounded-xl p-5 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
-                  <div className="absolute top-4 right-4 bg-warning/10 p-2 rounded-lg text-warning group-hover:scale-110 transition-transform">
-                    <Clock className="w-5 h-5" />
+                
+                <div className="bg-card border border-border/60 rounded-xl p-5 shadow-sm relative overflow-hidden group hover:-translate-y-1 hover:shadow-md transition-all duration-300">
+                  <div className="flex justify-between items-start mb-2">
+                    <p className="text-sm font-medium text-muted-foreground">Today's Leads</p>
+                    <div className="bg-warning/10 p-2 rounded-lg text-warning group-hover:scale-110 transition-transform"><Clock className="w-4 h-4" /></div>
                   </div>
-                  <p className="text-sm font-medium text-muted-foreground mb-1">Today's</p>
-                  <p className="text-2xl font-bold text-foreground">{todaysStudents}</p>
+                  <p className="text-3xl font-bold text-foreground">{todaysStudents}</p>
                 </div>
-                <div className="bg-card border border-border/60 rounded-xl p-5 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
-                  <div className="absolute top-4 right-4 bg-success/10 p-2 rounded-lg text-success group-hover:scale-110 transition-transform">
-                    <CheckCircle className="w-5 h-5" />
+                
+                <div className="bg-card border border-border/60 rounded-xl p-5 shadow-sm relative overflow-hidden group hover:-translate-y-1 hover:shadow-md transition-all duration-300">
+                  <div className="flex justify-between items-start mb-2">
+                    <p className="text-sm font-medium text-muted-foreground">Approved Admissions</p>
+                    <div className="bg-success/10 p-2 rounded-lg text-success group-hover:scale-110 transition-transform"><CheckCircle className="w-4 h-4" /></div>
                   </div>
-                  <p className="text-sm font-medium text-muted-foreground mb-1">Approved</p>
-                  <p className="text-2xl font-bold text-foreground">{approvedCount}</p>
+                  <p className="text-3xl font-bold text-foreground">{approvedCount}</p>
                 </div>
-                <div className="bg-card border border-[#10B981]/30 rounded-xl p-5 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
-                  <div className="absolute top-4 right-4 bg-[#10B981]/10 p-2 rounded-lg text-[#10B981] group-hover:scale-110 transition-transform">
-                    <IndianRupee className="w-5 h-5" />
+                
+                <div className="bg-card border border-[#10B981]/40 rounded-xl p-5 shadow-sm relative overflow-hidden group hover:-translate-y-1 hover:shadow-md transition-all duration-300 bg-gradient-to-br from-card to-[#10B981]/5">
+                  <div className="flex justify-between items-start mb-2">
+                    <p className="text-sm font-medium text-[#10B981]">Total Earnings</p>
+                    <div className="bg-[#10B981]/15 p-2 rounded-lg text-[#10B981] group-hover:scale-110 transition-transform"><IndianRupee className="w-4 h-4" /></div>
                   </div>
-                  <p className="text-sm font-medium text-muted-foreground mb-1">Total Earnings</p>
-                  <p className="text-2xl font-bold text-foreground">₹{totalEarnings}</p>
+                  <p className="text-3xl font-bold text-foreground">₹{totalEarnings.toLocaleString('en-IN')}</p>
                 </div>
               </div>
 
-              <div className="bg-card border border-border/60 rounded-xl p-5 shadow-sm">
-                <h4 className="font-semibold mb-6 text-foreground flex items-center gap-2">
-                  <BarChart3 className="w-5 h-5 text-primary" />
-                  Monthly Performance
-                </h4>
-                <ResponsiveContainer width="100%" height={250}>
-                  <BarChart data={vendorChartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                    <XAxis dataKey="month" stroke="#6B7280" fontSize={12} tickLine={false} axisLine={false} />
-                    <YAxis stroke="#6B7280" fontSize={12} tickLine={false} axisLine={false} />
-                    <Tooltip cursor={{ fill: 'rgba(0,0,0,0.05)' }} />
-                    <Bar dataKey="students" fill="#FF6B00" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
+              {/* MIDDLE SECTION: Chart & Overviews */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                {/* CHART CONTAINER */}
+                <div className="col-span-1 lg:col-span-2 bg-card border border-border/60 rounded-xl p-6 shadow-sm">
+                  <h4 className="font-semibold mb-6 text-foreground flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5 text-primary" />
+                    Growth & Performance
+                  </h4>
+                  {totalReferred === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-[260px] bg-muted/20 rounded-xl border-2 border-dashed border-border/60">
+                      <BarChart3 className="w-12 h-12 text-muted-foreground/30 mb-4" />
+                      <p className="text-muted-foreground font-semibold text-lg">No Performance Data</p>
+                      <p className="text-sm text-muted-foreground mb-6">This vendor hasn't generated any referrals yet.</p>
+                      <Button variant="outline" size="sm" onClick={() => copyToClipboard(`${window.location.origin}/enroll/${viewVendorPerformance.referral_code}`)}>
+                        <Copy className="w-4 h-4 mr-2" /> Share Referral Link
+                      </Button>
+                    </div>
+                  ) : (
+                    <ResponsiveContainer width="100%" height={260}>
+                      <BarChart data={vendorChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" vertical={false} />
+                        <XAxis dataKey="month" stroke="#6B7280" fontSize={12} tickLine={false} axisLine={false} />
+                        <YAxis stroke="#6B7280" fontSize={12} tickLine={false} axisLine={false} />
+                        <Tooltip cursor={{ fill: 'rgba(0,0,0,0.04)' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                        <Bar dataKey="students" fill="#F97316" radius={[6, 6, 0, 0]} maxBarSize={50} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  )}
+                </div>
+
+                {/* EARNINGS & REFERRAL LINK SIDEBAR */}
+                <div className="col-span-1 space-y-6">
+                  {/* Overview Card */}
+                  <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-[100px] -z-10"></div>
+                    <h4 className="font-semibold text-foreground mb-5 flex items-center gap-2">
+                      <Wallet className="w-5 h-5 text-primary" />
+                      Earnings Overview
+                    </h4>
+                    <div className="space-y-5 z-10 relative">
+                      <div className="flex justify-between items-end">
+                        <span className="text-sm text-muted-foreground font-medium">Total Payout</span>
+                        <span className="text-2xl font-bold text-success tracking-tight">₹{totalEarnings.toLocaleString('en-IN')}</span>
+                      </div>
+                      <div className="flex justify-between items-end">
+                        <span className="text-sm text-muted-foreground font-medium">Commission Rate</span>
+                        <span className="text-sm font-bold bg-muted px-2 py-1 rounded-md">₹{viewVendorPerformance.commission_rate || 0} / admit</span>
+                      </div>
+                      <div className="w-full h-px bg-border/60 my-2"></div>
+                      <div className="flex justify-between items-end">
+                        <span className="text-sm text-muted-foreground font-medium">Conversion Rate</span>
+                        <span className="text-lg font-bold text-primary flex items-center"><Percent className="w-4 h-4 mr-0.5" />{conversionRate}%</span>
+                      </div>
+                      <div className="w-full bg-muted rounded-full h-2.5 mt-2 overflow-hidden border border-border/40">
+                        <div className="bg-primary h-full rounded-full transition-all duration-1000 ease-out" style={{ width: `${Math.min(Number(conversionRate), 100)}%` }}></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Referral Link Card */}
+                  <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
+                    <h4 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider text-muted-foreground">Vendor Link</h4>
+                    <div className="flex items-center gap-2 bg-muted/40 p-1.5 rounded-lg border border-border/60">
+                      <input type="text" readOnly value={`${window.location.origin}/enroll/${viewVendorPerformance.referral_code}`} className="bg-transparent border-none outline-none text-xs w-full text-muted-foreground px-2 font-mono" />
+                      <Button size="sm" variant="outline" className="shrink-0 h-8" onClick={() => copyToClipboard(`${window.location.origin}/enroll/${viewVendorPerformance.referral_code}`)}>
+                        Copy
+                      </Button>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div className="mt-8 bg-card border border-border/60 rounded-xl shadow-sm overflow-hidden">
+              {/* TABLE SECTION */}
+              <div className="bg-card border border-border/60 rounded-xl shadow-sm overflow-hidden mt-6">
                 <div className="px-6 py-4 border-b border-border/60 bg-muted/10 flex justify-between items-center">
                   <h4 className="font-semibold text-foreground">Referred Students List</h4>
-                  <span className="text-xs font-bold bg-primary/10 text-primary px-3 py-1 rounded-full">{vendorStudents.length} Records</span>
+                  <span className="text-xs font-bold bg-primary/10 text-primary px-3 py-1 rounded-full">{vendorStudents.length} Enrollments</span>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead className="bg-muted/30">
                       <tr className="border-b border-border">
-                        <th className="text-left py-3 px-4 font-semibold text-foreground">Student Name</th>
-                        <th className="text-left py-3 px-4 font-semibold text-foreground">Phone</th>
-                        <th className="text-left py-3 px-4 font-semibold text-foreground">Class</th>
-                        <th className="text-left py-3 px-4 font-semibold text-foreground">Course</th>
-                        <th className="text-left py-3 px-4 font-semibold text-foreground">Status</th>
-                        <th className="text-left py-3 px-4 font-semibold text-foreground">Date</th>
+                        <th className="text-left py-4 px-6 font-semibold text-foreground">Student Name</th>
+                        <th className="text-left py-4 px-6 font-semibold text-foreground">Phone</th>
+                        <th className="text-left py-4 px-6 font-semibold text-foreground">Class & Course</th>
+                        <th className="text-left py-4 px-6 font-semibold text-foreground">Status</th>
+                        <th className="text-left py-4 px-6 font-semibold text-foreground">Date</th>
                       </tr>
                     </thead>
                     <tbody>
                       {vendorStudents.length === 0 ? (
-                        <tr><td colSpan={6} className="py-6 text-center text-muted-foreground">No students referred yet.</td></tr>
+                        <tr>
+                          <td colSpan={5} className="py-12 text-center">
+                            <div className="flex flex-col items-center justify-center">
+                              <Users className="w-10 h-10 text-muted-foreground/30 mb-3" />
+                              <p className="text-muted-foreground font-medium">No students found</p>
+                              <p className="text-sm text-muted-foreground/70">When this vendor refers students, they will appear here.</p>
+                            </div>
+                          </td>
+                        </tr>
                       ) : vendorStudents.map((student: any, idx: number) => (
                         <tr key={idx} className="border-b border-border hover:bg-muted/50 transition-colors">
-                          <td className="py-3 px-4 text-foreground font-medium">{student.name}</td>
-                          <td className="py-3 px-4 text-muted-foreground">{student.phone}</td>
-                          <td className="py-3 px-4 text-muted-foreground">{student.class || '-'}</td>
-                          <td className="py-3 px-4 text-muted-foreground">{student.course?.title || 'Unknown'}</td>
-                          <td className="py-3 px-4">
+                          <td className="py-4 px-6 text-foreground font-medium">{student.name}</td>
+                          <td className="py-4 px-6 text-muted-foreground">{student.phone}</td>
+                          <td className="py-4 px-6">
+                            <p className="text-foreground">{student.course?.title || 'Unknown'}</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">{student.class || '-'}</p>
+                          </td>
+                          <td className="py-4 px-6">
                             <span className={`px-2 py-1 rounded-[6px] text-xs font-semibold ${student.status === 'APPROVED' ? 'bg-success/20 text-success' : 'bg-warning/20 text-warning'}`}>
                               {student.status || 'PENDING'}
                             </span>
                           </td>
-                          <td className="py-3 px-4 text-muted-foreground">{new Date(student.created_at).toLocaleDateString()}</td>
+                          <td className="py-4 px-6 text-muted-foreground">{new Date(student.created_at).toLocaleDateString()}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -663,6 +754,7 @@ const VendorManagement = () => {
             </div>
           );
         })()}
+        </div>
       </DialogContent>
     </Dialog>
 
