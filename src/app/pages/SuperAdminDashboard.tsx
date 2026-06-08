@@ -129,45 +129,76 @@ const Dashboard = () => {
       </div>
 
       <Card>
-        <h3 className="text-lg font-semibold text-foreground mb-4">Recent Vendor Applications</h3>
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-lg font-semibold text-foreground">Recent Vendor Applications</h3>
+          {pendingApps.length > 0 && (
+            <span className="px-3 py-1 bg-primary/10 text-primary text-sm font-semibold rounded-full">
+              {pendingApps.length} Pending
+            </span>
+          )}
+        </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-border">
-                <th className="text-left py-3 px-4 text-sm font-semibold text-foreground">Vendor Name</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-foreground">Email</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-foreground">Phone</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-foreground">City</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-foreground">Status</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-foreground">Actions</th>
+              <tr className="border-b border-border bg-muted/20">
+                <th className="text-left py-4 px-4 text-sm font-semibold text-foreground">Vendor</th>
+                <th className="text-left py-4 px-4 text-sm font-semibold text-foreground">Contact Info</th>
+                <th className="text-left py-4 px-4 text-sm font-semibold text-foreground">Location</th>
+                <th className="text-left py-4 px-4 text-sm font-semibold text-foreground">Status</th>
+                <th className="text-left py-4 px-4 text-sm font-semibold text-foreground">Actions</th>
               </tr>
             </thead>
             <tbody>
               {pendingApps.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-muted-foreground">No pending vendor applications.</td>
+                  <td colSpan={5} className="py-12 text-center text-muted-foreground">
+                    <div className="flex flex-col items-center justify-center">
+                      <CheckCircle className="w-12 h-12 text-success/50 mb-3" />
+                      <p>All caught up! No pending vendor applications.</p>
+                    </div>
+                  </td>
                 </tr>
               ) : pendingApps.map((vendor: any) => (
                 <tr key={vendor.id} className="border-b border-border hover:bg-muted/50 transition-colors">
-                  <td className="py-3 px-4 text-foreground">{vendor.name}</td>
-                  <td className="py-3 px-4 text-muted-foreground">{vendor.email}</td>
-                  <td className="py-3 px-4 text-muted-foreground">{vendor.phone}</td>
-                  <td className="py-3 px-4 text-muted-foreground">{vendor.city}</td>
-                  <td className="py-3 px-4">
-                    <span className="px-3 py-1 bg-warning/20 text-warning rounded-[8px] text-sm font-semibold">
+                  <td className="py-4 px-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold shrink-0">
+                        {vendor.name.charAt(0).toUpperCase()}
+                      </div>
+                      <span className="font-medium text-foreground">{vendor.name}</span>
+                    </div>
+                  </td>
+                  <td className="py-4 px-4">
+                    <div className="flex flex-col">
+                      <span className="text-sm text-foreground">{vendor.email}</span>
+                      <span className="text-xs text-muted-foreground">{vendor.phone}</span>
+                    </div>
+                  </td>
+                  <td className="py-4 px-4 text-muted-foreground">{vendor.city}</td>
+                  <td className="py-4 px-4">
+                    <span className="px-3 py-1 bg-warning/10 text-warning border border-warning/20 rounded-full text-xs font-bold uppercase tracking-wider">
                       Pending
                     </span>
                   </td>
-                  <td className="py-3 px-4">
-                    <div className="flex gap-2">
-                      <button onClick={() => handleAction(vendor.id, 'approve')} className="p-2 hover:bg-success/20 rounded-[8px] transition-colors" title="Approve">
-                        <CheckCircle className="w-4 h-4 text-success" />
+                  <td className="py-4 px-4">
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={() => handleAction(vendor.id, 'approve')} 
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-success/10 hover:bg-success text-success hover:text-white rounded-md text-sm font-medium transition-colors"
+                      >
+                        <CheckCircle className="w-4 h-4" /> Approve
                       </button>
-                      <button onClick={() => handleAction(vendor.id, 'reject')} className="p-2 hover:bg-destructive/20 rounded-[8px] transition-colors" title="Reject">
-                        <XCircle className="w-4 h-4 text-destructive" />
+                      <button 
+                        onClick={() => handleAction(vendor.id, 'reject')} 
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-destructive/10 hover:bg-destructive text-destructive hover:text-white rounded-md text-sm font-medium transition-colors"
+                      >
+                        <XCircle className="w-4 h-4" /> Reject
                       </button>
-                      <button onClick={() => setViewApp(vendor)} className="p-2 hover:bg-primary-light rounded-[8px] transition-colors" title="View">
-                        <Eye className="w-4 h-4 text-primary" />
+                      <button 
+                        onClick={() => setViewApp(vendor)} 
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 hover:bg-primary text-primary hover:text-white rounded-md text-sm font-medium transition-colors"
+                      >
+                        <Eye className="w-4 h-4" /> View
                       </button>
                     </div>
                   </td>

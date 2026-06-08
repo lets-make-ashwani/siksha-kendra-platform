@@ -81,9 +81,22 @@ export const applyForVendor = async (req: Request, res: Response): Promise<any> 
   try {
     const data = applicationSchema.parse(req.body);
     
-    const existing = await prisma.vendorApplication.findUnique({ where: { email: data.email } });
-    if (existing) {
-      return res.status(400).json({ message: 'An application with this email already exists.' });
+    // 1. Check if the email or phone is already registered as an active User
+    const existingUser = await prisma.user.findFirst({
+      where: { OR: [{ email: data.email }, { phone: data.phone }] }
+    });
+    if (existingUser) {
+      if (existingUser.email === data.email) return res.status(400).json({ message: 'This email address is already registered. Please use another email.' });
+      if (existingUser.phone === data.phone) return res.status(400).json({ message: 'This mobile number is already registered. Please use another mobile number.' });
+    }
+
+    // 2. Check if the email or phone is already in a pending Vendor Application
+    const existingApp = await prisma.vendorApplication.findFirst({
+      where: { OR: [{ email: data.email }, { phone: data.phone }] }
+    });
+    if (existingApp) {
+      if (existingApp.email === data.email) return res.status(400).json({ message: 'An application with this email already exists. Please use another email.' });
+      if (existingApp.phone === data.phone) return res.status(400).json({ message: 'An application with this mobile number already exists. Please use another mobile number.' });
     }
 
     // Upload images to Cloudinary

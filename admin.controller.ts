@@ -28,9 +28,16 @@ export const inviteVendor = async (req: Request, res: Response): Promise<any> =>
     const { name, email, phone, address, city, state, pincode } = req.body;
 
     // Check if user already exists
-    const existingUser = await prisma.user.findUnique({ where: { email } });
+    const existingUser = await prisma.user.findFirst({ 
+      where: { OR: [{ email }, { phone }] } 
+    });
     if (existingUser) {
-      return res.status(400).json({ message: 'A user with this email already exists.' });
+      if (existingUser.email === email) {
+        return res.status(400).json({ message: 'A user with this email already exists.' });
+      }
+      if (existingUser.phone === phone) {
+        return res.status(400).json({ message: 'A user with this phone number already exists.' });
+      }
     }
 
     // Generate a temporary secure password for the new vendor
@@ -134,8 +141,16 @@ export const approveApplication = async (req: Request, res: Response): Promise<a
       return res.status(404).json({ message: 'Application not found or already processed.' });
     }
 
-    const existingUser = await prisma.user.findUnique({ where: { email: application.email } });
-    if (existingUser) return res.status(400).json({ message: 'User with this email already exists.' });
+    const existingUser = await prisma.user.findFirst({ 
+      where: { OR: [{ email: application.email }, { phone: application.phone }] } 
+    });
+    
+    if (existingUser) {
+      if (existingUser.email === application.email) 
+        return res.status(400).json({ message: 'A user with this email already exists.' });
+      if (existingUser.phone === application.phone) 
+        return res.status(400).json({ message: 'A user with this phone number already exists.' });
+    }
 
     const plainPassword = Math.random().toString(36).slice(-8) + 'A1!'; 
     const hashedPassword = await bcrypt.hash(plainPassword, 10);
