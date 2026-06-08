@@ -4,6 +4,7 @@ import { CheckCircle } from 'lucide-react';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import Card from '../components/Card';
+import { Logo } from '../components/Logo';
 
 export default function StudentRegistration() {
   const { referralCode } = useParams();
@@ -120,11 +121,8 @@ export default function StudentRegistration() {
     <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-primary-light to-accent py-12">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <img src="/TKS.png" alt="Topper's Siksha Kendra Logo" className="w-12 h-12 object-contain" />
-            <span className="text-2xl font-bold text-foreground">
-              Topper<span className="text-primary">'s</span> Siksha <span className="text-primary">Kendra</span>
-            </span>
+          <div className="flex justify-center mb-6">
+            <Logo />
           </div>
           <h1 className="text-4xl font-bold text-foreground mb-3">Student Registration</h1>
           <p className="text-lg text-muted-foreground">Join thousands of students on their learning journey</p>

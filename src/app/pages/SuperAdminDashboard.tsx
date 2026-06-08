@@ -213,47 +213,113 @@ const Dashboard = () => {
       </Card>
 
       <Dialog open={!!viewApp} onOpenChange={(open) => !open && setViewApp(null)}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Vendor Application Details</DialogTitle>
-          </DialogHeader>
-          {viewApp && (
-            <div className="space-y-6 mt-4">
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <p><strong>Name:</strong> {viewApp.name}</p>
-                <p><strong>Email:</strong> {viewApp.email}</p>
-                <p><strong>Phone:</strong> {viewApp.phone}</p>
-                <p><strong>Address:</strong> {viewApp.address}, {viewApp.city}, {viewApp.state} - {viewApp.pincode}</p>
-                <p><strong>Aadhaar Number:</strong> {viewApp.aadhaar_number}</p>
-                <p><strong>PAN Number:</strong> {viewApp.pan_number}</p>
-                <p><strong>Bank:</strong> {viewApp.bank_name} ({viewApp.branch_name})</p>
-                <p><strong>Account No:</strong> {viewApp.account_number}</p>
-                <p><strong>IFSC:</strong> {viewApp.ifsc_code}</p>
-              </div>
-              
-              <div>
-                <h4 className="font-semibold mb-3">Uploaded Documents</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="border rounded p-2">
-                    <p className="text-xs text-center mb-2 font-medium">Aadhaar (Front)</p>
-                    <img src={viewApp.aadhaar_front} alt="Aadhaar Front" className="w-full h-auto object-contain rounded cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setFullScreenImage(viewApp.aadhaar_front)} />
+        <DialogContent className="max-w-[1200px] w-[90vw] h-[90vh] p-0 flex flex-col gap-0 overflow-hidden bg-background border-border/50">
+          <div className="px-6 py-5 border-b border-border/60 bg-card flex flex-row items-center justify-between z-10 shadow-sm shrink-0">
+            <div className="flex items-center gap-4 text-left">
+               <div className="w-14 h-14 rounded-full bg-primary/10 text-primary flex items-center justify-center text-2xl font-bold border border-primary/20 shadow-sm">
+                 {viewApp?.name?.charAt(0).toUpperCase() || 'V'}
+               </div>
+               <div>
+                 <DialogTitle className="text-2xl font-bold text-foreground flex items-center gap-3 m-0">
+                   {viewApp?.name}
+                   <span className="px-2.5 py-0.5 text-[10px] uppercase tracking-wider rounded-full font-bold bg-warning/15 text-warning">
+                     PENDING
+                   </span>
+                 </DialogTitle>
+                 <p className="text-sm text-muted-foreground font-medium mt-1">
+                   Vendor Application Details
+                 </p>
+               </div>
+            </div>
+            <div className="flex items-center gap-3 pr-8">
+               <Button variant="danger" onClick={() => { handleAction(viewApp.id, 'reject'); setViewApp(null); }} className="shadow-sm">
+                 <XCircle className="w-4 h-4 mr-2" /> Reject
+               </Button>
+               <Button className="bg-[#22C55E] hover:bg-[#16a34a] text-white shadow-sm" onClick={() => { setConfirmApproveId(viewApp.id); setViewApp(null); }}>
+                 <CheckCircle className="w-4 h-4 mr-2" /> Approve
+               </Button>
+            </div>
+          </div>
+          <div className="flex-1 overflow-y-auto p-8 bg-muted/10">
+            {viewApp && (
+              <div className="space-y-8 w-full max-w-[1152px] mx-auto pb-4 px-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
+                    <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 border-b border-border/60 pb-3">
+                      <UserCircle className="w-5 h-5 text-primary" /> Personal Details
+                    </h4>
+                    <div className="space-y-3 text-sm">
+                      <div className="flex justify-between"><span className="text-muted-foreground">Name:</span> <span className="font-medium">{viewApp.name}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">Email:</span> <span className="font-medium">{viewApp.email}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">Phone:</span> <span className="font-medium">{viewApp.phone}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">Aadhaar No:</span> <span className="font-medium">{viewApp.aadhaar_number}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">PAN No:</span> <span className="font-medium">{viewApp.pan_number}</span></div>
+                    </div>
                   </div>
-                  <div className="border rounded p-2">
-                    <p className="text-xs text-center mb-2 font-medium">Aadhaar (Back)</p>
-                    <img src={viewApp.aadhaar_back} alt="Aadhaar Back" className="w-full h-auto object-contain rounded cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setFullScreenImage(viewApp.aadhaar_back)} />
+                  <div className="space-y-6">
+                    <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
+                      <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 border-b border-border/60 pb-3">
+                        <Wallet className="w-5 h-5 text-success" /> Banking Details
+                      </h4>
+                      <div className="space-y-3 text-sm">
+                        <div className="flex justify-between"><span className="text-muted-foreground">Bank:</span> <span className="font-medium">{viewApp.bank_name}</span></div>
+                        <div className="flex justify-between"><span className="text-muted-foreground">Branch:</span> <span className="font-medium">{viewApp.branch_name}</span></div>
+                        <div className="flex justify-between"><span className="text-muted-foreground">Account No:</span> <span className="font-medium">{viewApp.account_number}</span></div>
+                        <div className="flex justify-between"><span className="text-muted-foreground">IFSC:</span> <span className="font-medium">{viewApp.ifsc_code}</span></div>
+                      </div>
+                    </div>
+                    <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
+                      <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 border-b border-border/60 pb-3">
+                        <Copy className="w-5 h-5 text-warning" /> Address Details
+                      </h4>
+                      <p className="text-sm text-foreground leading-relaxed">
+                        {viewApp.address},<br/>{viewApp.city}, {viewApp.state} - {viewApp.pincode}
+                      </p>
+                    </div>
                   </div>
-                  <div className="border rounded p-2">
-                    <p className="text-xs text-center mb-2 font-medium">PAN Card</p>
-                    <img src={viewApp.pan_image} alt="PAN Card" className="w-full h-auto object-contain rounded cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setFullScreenImage(viewApp.pan_image)} />
-                  </div>
-                  <div className="border rounded p-2">
-                    <p className="text-xs text-center mb-2 font-medium">Bank Passbook</p>
-                    <img src={viewApp.passbook_image} alt="Passbook" className="w-full h-auto object-contain rounded cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setFullScreenImage(viewApp.passbook_image)} />
+                </div>
+                <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
+                  <h4 className="font-semibold text-foreground mb-6 flex items-center gap-2 border-b border-border/60 pb-3">
+                    <Eye className="w-5 h-5 text-primary" /> Uploaded Documents
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {viewApp.aadhaar_front && (
+                      <div className="border border-border/60 rounded-lg p-3 bg-muted/20 hover:bg-muted/40 transition-colors group cursor-pointer" onClick={() => setFullScreenImage(viewApp.aadhaar_front)}>
+                        <p className="text-xs text-center mb-3 font-medium text-muted-foreground group-hover:text-primary transition-colors">Aadhaar (Front)</p>
+                        <div className="aspect-[4/3] bg-black/5 rounded flex items-center justify-center overflow-hidden">
+                          <img src={viewApp.aadhaar_front} alt="Aadhaar Front" className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" />
+                        </div>
+                      </div>
+                    )}
+                    {viewApp.aadhaar_back && (
+                      <div className="border border-border/60 rounded-lg p-3 bg-muted/20 hover:bg-muted/40 transition-colors group cursor-pointer" onClick={() => setFullScreenImage(viewApp.aadhaar_back)}>
+                        <p className="text-xs text-center mb-3 font-medium text-muted-foreground group-hover:text-primary transition-colors">Aadhaar (Back)</p>
+                        <div className="aspect-[4/3] bg-black/5 rounded flex items-center justify-center overflow-hidden">
+                          <img src={viewApp.aadhaar_back} alt="Aadhaar Back" className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" />
+                        </div>
+                      </div>
+                    )}
+                    {viewApp.pan_image && (
+                      <div className="border border-border/60 rounded-lg p-3 bg-muted/20 hover:bg-muted/40 transition-colors group cursor-pointer" onClick={() => setFullScreenImage(viewApp.pan_image)}>
+                        <p className="text-xs text-center mb-3 font-medium text-muted-foreground group-hover:text-primary transition-colors">PAN Card</p>
+                        <div className="aspect-[4/3] bg-black/5 rounded flex items-center justify-center overflow-hidden">
+                          <img src={viewApp.pan_image} alt="PAN Card" className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" />
+                        </div>
+                      </div>
+                    )}
+                    {viewApp.passbook_image && (
+                      <div className="border border-border/60 rounded-lg p-3 bg-muted/20 hover:bg-muted/40 transition-colors group cursor-pointer" onClick={() => setFullScreenImage(viewApp.passbook_image)}>
+                        <p className="text-xs text-center mb-3 font-medium text-muted-foreground group-hover:text-primary transition-colors">Bank Passbook</p>
+                        <div className="aspect-[4/3] bg-black/5 rounded flex items-center justify-center overflow-hidden">
+                          <img src={viewApp.passbook_image} alt="Passbook" className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </DialogContent>
       </Dialog>
 
@@ -554,7 +620,7 @@ const VendorManagement = () => {
     </Dialog>
 
     <Dialog open={!!viewVendorPerformance} onOpenChange={(open) => !open && setViewVendorPerformance(null)}>
-      <DialogContent className="max-w-[1200px] h-[90vh] p-0 flex flex-col gap-0 overflow-hidden bg-background border-border/50">
+      <DialogContent className="max-w-[1400px] w-[95vw] h-[95vh] p-0 flex flex-col gap-0 overflow-hidden bg-background border-border/50">
         {/* STICKY PREMIUM HEADER */}
         <div className="px-6 py-5 border-b border-border/60 bg-card flex flex-row items-center justify-between z-10 shadow-sm shrink-0">
           <div className="flex items-center gap-4 text-left">
@@ -616,7 +682,7 @@ const VendorManagement = () => {
           const vendorChartData = months.slice(0, currentMonth + 1).map((month, idx) => ({ month, students: counts[idx] }));
 
           return (
-            <div className="space-y-6 max-w-[1152px] mx-auto pb-4">
+            <div className="space-y-6 w-full max-w-full mx-auto pb-4 px-2">
               
               {/* KPI CARDS (SaaS Style) */}
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -790,76 +856,150 @@ const VendorManagement = () => {
     </Dialog>
 
     <Dialog open={!!viewVendorDetails} onOpenChange={(open) => { if (!open) { setViewVendorDetails(null); setIsEditingCommission(false); }}}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex justify-between items-center pr-6">
-            <span>Vendor Basic Information</span>
-            <Button variant="danger" size="sm" onClick={() => { handleDeleteVendor(viewVendorDetails.id); setViewVendorDetails(null); }}>
+      <DialogContent className="max-w-[1200px] w-[90vw] h-[90vh] p-0 flex flex-col gap-0 overflow-hidden bg-background border-border/50">
+        {/* STICKY PREMIUM HEADER */}
+        <div className="px-6 py-5 border-b border-border/60 bg-card flex flex-row items-center justify-between z-10 shadow-sm shrink-0">
+          <div className="flex items-center gap-4 text-left">
+             <div className="w-14 h-14 rounded-full bg-primary/10 text-primary flex items-center justify-center text-2xl font-bold border border-primary/20 shadow-sm">
+               {viewVendorDetails?.user?.name?.charAt(0).toUpperCase() || 'V'}
+             </div>
+             <div>
+               <DialogTitle className="text-2xl font-bold text-foreground flex items-center gap-3 m-0">
+                 {viewVendorDetails?.user?.name}
+                 <span className={`px-2.5 py-0.5 text-[10px] uppercase tracking-wider rounded-full font-bold ${viewVendorDetails?.status === 'ACTIVE' ? 'bg-success/15 text-success' : 'bg-destructive/15 text-destructive'}`}>
+                   {viewVendorDetails?.status}
+                 </span>
+               </DialogTitle>
+               <p className="text-sm text-muted-foreground font-medium mt-1">
+                 Vendor Profile & Basic Information
+               </p>
+             </div>
+          </div>
+          <div className="flex items-center gap-3 pr-8">
+            <Button variant="danger" onClick={() => { handleDeleteVendor(viewVendorDetails.id); setViewVendorDetails(null); }} className="shadow-sm">
+              <XCircle className="w-4 h-4 mr-2" />
               Delete Vendor
             </Button>
-          </DialogTitle>
-        </DialogHeader>
-        {viewVendorDetails && (
-          <div className="space-y-6 mt-4">
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <p><strong>Vendor ID:</strong> {viewVendorDetails.vendor_id}</p>
-              <p><strong>Referral Code:</strong> {viewVendorDetails.referral_code}</p>
-              <p><strong>Name:</strong> {viewVendorDetails.user?.name}</p>
-              <p><strong>Email:</strong> {viewVendorDetails.user?.email}</p>
-              <p><strong>Phone:</strong> {viewVendorDetails.user?.phone}</p>
-              <p><strong>Address:</strong> {viewVendorDetails.address}, {viewVendorDetails.city}, {viewVendorDetails.state} - {viewVendorDetails.pincode}</p>
-              <p><strong>Aadhaar Number:</strong> {viewVendorDetails.aadhaar_number}</p>
-              <p><strong>PAN Number:</strong> {viewVendorDetails.pan_number}</p>
-              <p><strong>Bank:</strong> {viewVendorDetails.bank_name} ({viewVendorDetails.branch_name})</p>
-              <p><strong>Account No:</strong> {viewVendorDetails.account_number}</p>
-              <p><strong>IFSC:</strong> {viewVendorDetails.ifsc_code}</p>
-              <div className="flex items-center gap-2">
-                <strong>Commission Rate:</strong> 
-                {isEditingCommission ? (
-                  <div className="flex items-center gap-2">
-                    <input 
-                      type="number" 
-                      value={editCommissionValue} 
-                      onChange={(e) => setEditCommissionValue(e.target.value)} 
-                      className="w-24 px-2 py-1 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-background text-foreground"
-                    />
-                    <Button size="sm" onClick={() => handleUpdateCommission(viewVendorDetails.id)}>Save</Button>
-                    <Button size="sm" variant="outline" onClick={() => setIsEditingCommission(false)}>Cancel</Button>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <span>₹{viewVendorDetails.commission_rate || 0} per referral</span>
-                    <button onClick={() => { setEditCommissionValue(viewVendorDetails.commission_rate?.toString() || '0'); setIsEditingCommission(true); }} className="text-primary text-xs font-medium hover:underline">Edit</button>
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            <div className="bg-warning/10 border border-warning/20 p-4 rounded-[8px]">
-               <p className="text-sm text-warning-foreground">
-                 <strong>Note about Passwords:</strong> For security reasons, vendor passwords are encrypted (hashed) in the database and cannot be viewed by anyone, including Super Admins. If a vendor loses their password, they must use the "Forgot Password" flow to reset it.
-               </p>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-3">Uploaded Documents</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {viewVendorDetails.aadhaar_front && (
-                  <div className="border rounded p-2"><p className="text-xs text-center mb-2 font-medium">Aadhaar (Front)</p><img src={viewVendorDetails.aadhaar_front} alt="Aadhaar Front" className="w-full h-auto object-contain rounded cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setFullScreenImage(viewVendorDetails.aadhaar_front)} /></div>
-                )}
-                {viewVendorDetails.aadhaar_back && (
-                  <div className="border rounded p-2"><p className="text-xs text-center mb-2 font-medium">Aadhaar (Back)</p><img src={viewVendorDetails.aadhaar_back} alt="Aadhaar Back" className="w-full h-auto object-contain rounded cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setFullScreenImage(viewVendorDetails.aadhaar_back)} /></div>
-                )}
-                {viewVendorDetails.pan_image && (
-                  <div className="border rounded p-2"><p className="text-xs text-center mb-2 font-medium">PAN Card</p><img src={viewVendorDetails.pan_image} alt="PAN Card" className="w-full h-auto object-contain rounded cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setFullScreenImage(viewVendorDetails.pan_image)} /></div>
-                )}
-                {viewVendorDetails.passbook_image && (
-                  <div className="border rounded p-2"><p className="text-xs text-center mb-2 font-medium">Bank Passbook</p><img src={viewVendorDetails.passbook_image} alt="Passbook" className="w-full h-auto object-contain rounded cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setFullScreenImage(viewVendorDetails.passbook_image)} /></div>
-                )}
-              </div>
-            </div>
           </div>
-        )}
+        </div>
+
+        {/* SCROLLABLE DASHBOARD CONTENT */}
+        <div className="flex-1 overflow-y-auto p-8 bg-muted/10">
+          {viewVendorDetails && (
+            <div className="space-y-8 w-full max-w-[1152px] mx-auto pb-4 px-2">
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
+                  <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 border-b border-border/60 pb-3">
+                    <UserCircle className="w-5 h-5 text-primary" />
+                    Personal Details
+                  </h4>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between"><span className="text-muted-foreground">Vendor ID:</span> <span className="font-medium">{viewVendorDetails.vendor_id}</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">Referral Code:</span> <span className="font-medium text-primary bg-primary/10 px-2 py-0.5 rounded">{viewVendorDetails.referral_code}</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">Email:</span> <span className="font-medium">{viewVendorDetails.user?.email}</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">Phone:</span> <span className="font-medium">{viewVendorDetails.user?.phone}</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">Aadhaar No:</span> <span className="font-medium">{viewVendorDetails.aadhaar_number}</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">PAN No:</span> <span className="font-medium">{viewVendorDetails.pan_number}</span></div>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
+                    <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 border-b border-border/60 pb-3">
+                      <Wallet className="w-5 h-5 text-success" />
+                      Banking Details
+                    </h4>
+                    <div className="space-y-3 text-sm">
+                      <div className="flex justify-between"><span className="text-muted-foreground">Bank:</span> <span className="font-medium">{viewVendorDetails.bank_name}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">Branch:</span> <span className="font-medium">{viewVendorDetails.branch_name}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">Account No:</span> <span className="font-medium">{viewVendorDetails.account_number}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">IFSC:</span> <span className="font-medium">{viewVendorDetails.ifsc_code}</span></div>
+                      <div className="flex justify-between items-center mt-2 pt-2 border-t border-border/40">
+                        <span className="text-muted-foreground">Commission Rate:</span> 
+                        {isEditingCommission ? (
+                          <div className="flex items-center gap-2">
+                            <input 
+                              type="number" 
+                              value={editCommissionValue} 
+                              onChange={(e) => setEditCommissionValue(e.target.value)} 
+                              className="w-20 px-2 py-1 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-background text-foreground"
+                            />
+                            <Button size="sm" onClick={() => handleUpdateCommission(viewVendorDetails.id)}>Save</Button>
+                            <Button size="sm" variant="outline" onClick={() => setIsEditingCommission(false)}>Cancel</Button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-success bg-success/10 px-2 py-1 rounded">₹{viewVendorDetails.commission_rate || 0} / admit</span>
+                            <button onClick={() => { setEditCommissionValue(viewVendorDetails.commission_rate?.toString() || '0'); setIsEditingCommission(true); }} className="text-primary text-xs font-medium hover:underline">Edit</button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
+                    <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 border-b border-border/60 pb-3">
+                      <Copy className="w-5 h-5 text-warning" />
+                      Address Details
+                    </h4>
+                    <p className="text-sm text-foreground leading-relaxed">
+                      {viewVendorDetails.address},<br/>
+                      {viewVendorDetails.city}, {viewVendorDetails.state} - {viewVendorDetails.pincode}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-warning/10 border border-warning/20 p-4 rounded-xl flex gap-3">
+                 <Settings className="w-5 h-5 text-warning shrink-0" />
+                 <p className="text-sm text-warning-foreground">
+                   <strong>Note about Passwords:</strong> For security reasons, vendor passwords are encrypted (hashed) in the database and cannot be viewed by anyone, including Super Admins. If a vendor loses their password, they must use the "Forgot Password" flow to reset it.
+                 </p>
+              </div>
+
+              <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
+                <h4 className="font-semibold text-foreground mb-6 flex items-center gap-2 border-b border-border/60 pb-3">
+                  <Eye className="w-5 h-5 text-primary" />
+                  Uploaded Documents
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {viewVendorDetails.aadhaar_front && (
+                    <div className="border border-border/60 rounded-lg p-3 bg-muted/20 hover:bg-muted/40 transition-colors group cursor-pointer" onClick={() => setFullScreenImage(viewVendorDetails.aadhaar_front)}>
+                      <p className="text-xs text-center mb-3 font-medium text-muted-foreground group-hover:text-primary transition-colors">Aadhaar (Front)</p>
+                      <div className="aspect-[4/3] bg-black/5 rounded flex items-center justify-center overflow-hidden">
+                        <img src={viewVendorDetails.aadhaar_front} alt="Aadhaar Front" className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" />
+                      </div>
+                    </div>
+                  )}
+                  {viewVendorDetails.aadhaar_back && (
+                    <div className="border border-border/60 rounded-lg p-3 bg-muted/20 hover:bg-muted/40 transition-colors group cursor-pointer" onClick={() => setFullScreenImage(viewVendorDetails.aadhaar_back)}>
+                      <p className="text-xs text-center mb-3 font-medium text-muted-foreground group-hover:text-primary transition-colors">Aadhaar (Back)</p>
+                      <div className="aspect-[4/3] bg-black/5 rounded flex items-center justify-center overflow-hidden">
+                        <img src={viewVendorDetails.aadhaar_back} alt="Aadhaar Back" className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" />
+                      </div>
+                    </div>
+                  )}
+                  {viewVendorDetails.pan_image && (
+                    <div className="border border-border/60 rounded-lg p-3 bg-muted/20 hover:bg-muted/40 transition-colors group cursor-pointer" onClick={() => setFullScreenImage(viewVendorDetails.pan_image)}>
+                      <p className="text-xs text-center mb-3 font-medium text-muted-foreground group-hover:text-primary transition-colors">PAN Card</p>
+                      <div className="aspect-[4/3] bg-black/5 rounded flex items-center justify-center overflow-hidden">
+                        <img src={viewVendorDetails.pan_image} alt="PAN Card" className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" />
+                      </div>
+                    </div>
+                  )}
+                  {viewVendorDetails.passbook_image && (
+                    <div className="border border-border/60 rounded-lg p-3 bg-muted/20 hover:bg-muted/40 transition-colors group cursor-pointer" onClick={() => setFullScreenImage(viewVendorDetails.passbook_image)}>
+                      <p className="text-xs text-center mb-3 font-medium text-muted-foreground group-hover:text-primary transition-colors">Bank Passbook</p>
+                      <div className="aspect-[4/3] bg-black/5 rounded flex items-center justify-center overflow-hidden">
+                        <img src={viewVendorDetails.passbook_image} alt="Passbook" className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </DialogContent>
     </Dialog>
 
@@ -986,30 +1126,77 @@ const StudentManagement = () => {
     </Card>
 
     <Dialog open={!!viewStudent} onOpenChange={(open) => !open && setViewStudent(null)}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>Student Details</DialogTitle>
-        </DialogHeader>
-        {viewStudent && (
-          <div className="space-y-4 mt-4">
-            <h4 className="font-semibold text-foreground border-b border-border pb-2">Basic Information</h4>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <p><strong>Enrollment ID:</strong> {viewStudent.enrollment_id || '-'}</p>
-              <p><strong>Name:</strong> {viewStudent.name}</p>
-              <p><strong>Email:</strong> {viewStudent.email}</p>
-              <p><strong>Phone:</strong> {viewStudent.phone}</p>
-              <p><strong>Class:</strong> {viewStudent.class || '-'}</p>
-              <p><strong>Course:</strong> {viewStudent.course?.title || '-'}</p>
-              <p><strong>Vendor:</strong> {viewStudent.vendor?.user?.name || 'Direct Enrollment'}</p>
-              <p><strong>Status:</strong> <span className={viewStudent.status === 'APPROVED' ? 'text-success font-semibold' : 'text-warning font-semibold'}>{viewStudent.status || 'PENDING'}</span></p>
-              <p><strong>Address:</strong> {viewStudent.address || '-'}</p>
-              <p><strong>School Name:</strong> {viewStudent.school_name || '-'}</p>
-              <p><strong>Parent Name:</strong> {viewStudent.parent_name || '-'}</p>
-              <p><strong>Parent Phone:</strong> {viewStudent.parent_phone || '-'}</p>
-              <p><strong>Enrolled Date:</strong> {new Date(viewStudent.created_at).toLocaleString()}</p>
-            </div>
+      <DialogContent className="max-w-[1000px] w-[85vw] h-[85vh] p-0 flex flex-col gap-0 overflow-hidden bg-background border-border/50">
+        {/* STICKY HEADER */}
+        <div className="px-6 py-5 border-b border-border/60 bg-card flex flex-row items-center justify-between z-10 shadow-sm shrink-0">
+          <div className="flex items-center gap-4 text-left">
+             <div className="w-14 h-14 rounded-full bg-success/10 text-success flex items-center justify-center text-2xl font-bold border border-success/20 shadow-sm">
+               {viewStudent?.name?.charAt(0).toUpperCase() || 'S'}
+             </div>
+             <div>
+               <DialogTitle className="text-2xl font-bold text-foreground flex items-center gap-3 m-0">
+                 {viewStudent?.name}
+                 <span className={`px-2.5 py-0.5 text-[10px] uppercase tracking-wider rounded-full font-bold ${viewStudent?.status === 'APPROVED' ? 'bg-success/15 text-success' : 'bg-warning/15 text-warning'}`}>
+                   {viewStudent?.status || 'PENDING'}
+                 </span>
+               </DialogTitle>
+               <p className="text-sm text-muted-foreground font-medium mt-1">
+                 Student Details & Enrollment Info
+               </p>
+             </div>
           </div>
-        )}
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-8 bg-muted/10">
+          {viewStudent && (
+            <div className="space-y-6 w-full max-w-5xl mx-auto pb-4 px-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
+                  <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 border-b border-border/60 pb-3">
+                    <UserCircle className="w-5 h-5 text-primary" />
+                    Student Profile
+                  </h4>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between"><span className="text-muted-foreground">Enrollment ID:</span> <span className="font-medium bg-primary/10 text-primary px-2 py-0.5 rounded">{viewStudent.enrollment_id || '-'}</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">Email:</span> <span className="font-medium">{viewStudent.email}</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">Phone:</span> <span className="font-medium">{viewStudent.phone}</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">Address:</span> <span className="font-medium text-right max-w-[200px]">{viewStudent.address || '-'}</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">Enrolled On:</span> <span className="font-medium">{new Date(viewStudent.created_at).toLocaleString()}</span></div>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
+                    <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 border-b border-border/60 pb-3">
+                      <BookOpen className="w-5 h-5 text-success" />
+                      Academic Info
+                    </h4>
+                    <div className="space-y-3 text-sm">
+                      <div className="flex justify-between"><span className="text-muted-foreground">Course:</span> <span className="font-medium text-right max-w-[200px]">{viewStudent.course?.title || '-'}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">Class:</span> <span className="font-medium">{viewStudent.class || '-'}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">School Name:</span> <span className="font-medium text-right max-w-[200px]">{viewStudent.school_name || '-'}</span></div>
+                    </div>
+                  </div>
+
+                  <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
+                    <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 border-b border-border/60 pb-3">
+                      <Users className="w-5 h-5 text-warning" />
+                      Parent & Vendor
+                    </h4>
+                    <div className="space-y-3 text-sm">
+                      <div className="flex justify-between"><span className="text-muted-foreground">Parent Name:</span> <span className="font-medium">{viewStudent.parent_name || '-'}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">Parent Phone:</span> <span className="font-medium">{viewStudent.parent_phone || '-'}</span></div>
+                      <div className="flex justify-between items-center mt-2 pt-2 border-t border-border/40">
+                        <span className="text-muted-foreground">Referred By:</span> 
+                        <span className="font-medium text-[#0B1B52] bg-[#0B1B52]/10 px-2 py-0.5 rounded">{viewStudent.vendor?.user?.name || 'Direct Enrollment'}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   </div>

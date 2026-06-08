@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate, useNavigate } from 'react-router';
 import { useState, useEffect } from 'react';
-import { BarChart3, Users, UserCheck, Clock, UserCircle, Settings, Copy, Share2, QrCode, LogOut, IndianRupee } from 'lucide-react';
+import { BarChart3, Users, UserCheck, Clock, UserCircle, Settings, Copy, Share2, QrCode, LogOut, IndianRupee, BookOpen } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import Sidebar from '../components/Sidebar';
 import StatCard from '../components/StatCard';
@@ -227,29 +227,72 @@ const Dashboard = () => {
       </Card>
 
       <Dialog open={!!viewStudent} onOpenChange={(open) => !open && setViewStudent(null)}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Student Details</DialogTitle>
-          </DialogHeader>
-          {viewStudent && (
-            <div className="space-y-4 mt-4">
-              <h4 className="font-semibold text-foreground border-b border-border pb-2">Basic Information</h4>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <p><strong>Enrollment ID:</strong> {viewStudent.enrollment_id || '-'}</p>
-                <p><strong>Name:</strong> {viewStudent.name}</p>
-                <p><strong>Email:</strong> {viewStudent.email}</p>
-                <p><strong>Phone:</strong> {viewStudent.phone}</p>
-                <p><strong>Class:</strong> {viewStudent.class || '-'}</p>
-                <p><strong>Course:</strong> {viewStudent.course?.title || '-'}</p>
-                <p><strong>Status:</strong> <span className={viewStudent.status === 'APPROVED' ? 'text-success font-semibold' : 'text-warning font-semibold'}>{viewStudent.status || 'PENDING'}</span></p>
-                <p><strong>Address:</strong> {viewStudent.address || '-'}</p>
-                <p><strong>School Name:</strong> {viewStudent.school_name || '-'}</p>
-                <p><strong>Parent Name:</strong> {viewStudent.parent_name || '-'}</p>
-                <p><strong>Parent Phone:</strong> {viewStudent.parent_phone || '-'}</p>
-                <p><strong>Enrolled Date:</strong> {new Date(viewStudent.created_at).toLocaleString()}</p>
-              </div>
+        <DialogContent className="max-w-[850px] h-[80vh] p-0 flex flex-col gap-0 overflow-hidden bg-background border-border/50">
+          <div className="px-6 py-5 border-b border-border/60 bg-card flex flex-row items-center justify-between z-10 shadow-sm shrink-0">
+            <div className="flex items-center gap-4 text-left">
+               <div className="w-14 h-14 rounded-full bg-success/10 text-success flex items-center justify-center text-2xl font-bold border border-success/20 shadow-sm">
+                 {viewStudent?.name?.charAt(0).toUpperCase() || 'S'}
+               </div>
+               <div>
+                 <DialogTitle className="text-2xl font-bold text-foreground flex items-center gap-3 m-0">
+                   {viewStudent?.name}
+                   <span className={`px-2.5 py-0.5 text-[10px] uppercase tracking-wider rounded-full font-bold ${viewStudent?.status === 'APPROVED' ? 'bg-success/15 text-success' : 'bg-warning/15 text-warning'}`}>
+                     {viewStudent?.status || 'PENDING'}
+                   </span>
+                 </DialogTitle>
+                 <p className="text-sm text-muted-foreground font-medium mt-1">
+                   Student Details & Enrollment Info
+                 </p>
+               </div>
             </div>
-          )}
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-8 bg-muted/10">
+            {viewStudent && (
+              <div className="space-y-6 max-w-3xl mx-auto pb-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
+                    <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 border-b border-border/60 pb-3">
+                      <UserCircle className="w-5 h-5 text-primary" />
+                      Student Profile
+                    </h4>
+                    <div className="space-y-3 text-sm">
+                      <div className="flex justify-between"><span className="text-muted-foreground">Enrollment ID:</span> <span className="font-medium bg-primary/10 text-primary px-2 py-0.5 rounded">{viewStudent.enrollment_id || '-'}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">Email:</span> <span className="font-medium">{viewStudent.email}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">Phone:</span> <span className="font-medium">{viewStudent.phone}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">Address:</span> <span className="font-medium text-right max-w-[200px]">{viewStudent.address || '-'}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">Enrolled On:</span> <span className="font-medium">{new Date(viewStudent.created_at).toLocaleString()}</span></div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
+                      <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 border-b border-border/60 pb-3">
+                        <BookOpen className="w-5 h-5 text-success" />
+                        Academic Info
+                      </h4>
+                      <div className="space-y-3 text-sm">
+                        <div className="flex justify-between"><span className="text-muted-foreground">Course:</span> <span className="font-medium text-right max-w-[200px]">{viewStudent.course?.title || '-'}</span></div>
+                        <div className="flex justify-between"><span className="text-muted-foreground">Class:</span> <span className="font-medium">{viewStudent.class || '-'}</span></div>
+                        <div className="flex justify-between"><span className="text-muted-foreground">School Name:</span> <span className="font-medium text-right max-w-[200px]">{viewStudent.school_name || '-'}</span></div>
+                      </div>
+                    </div>
+
+                    <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
+                      <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 border-b border-border/60 pb-3">
+                        <Users className="w-5 h-5 text-warning" />
+                        Parent Details
+                      </h4>
+                      <div className="space-y-3 text-sm">
+                        <div className="flex justify-between"><span className="text-muted-foreground">Parent Name:</span> <span className="font-medium">{viewStudent.parent_name || '-'}</span></div>
+                        <div className="flex justify-between"><span className="text-muted-foreground">Parent Phone:</span> <span className="font-medium">{viewStudent.parent_phone || '-'}</span></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>
@@ -331,29 +374,72 @@ const StudentList = () => {
     </Card>
 
     <Dialog open={!!viewStudent} onOpenChange={(open) => !open && setViewStudent(null)}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>Student Details</DialogTitle>
-        </DialogHeader>
-        {viewStudent && (
-          <div className="space-y-4 mt-4">
-            <h4 className="font-semibold text-foreground border-b border-border pb-2">Basic Information</h4>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-                <p><strong>Enrollment ID:</strong> {viewStudent.enrollment_id || '-'}</p>
-              <p><strong>Name:</strong> {viewStudent.name}</p>
-              <p><strong>Email:</strong> {viewStudent.email}</p>
-              <p><strong>Phone:</strong> {viewStudent.phone}</p>
-              <p><strong>Class:</strong> {viewStudent.class || '-'}</p>
-              <p><strong>Course:</strong> {viewStudent.course?.title || '-'}</p>
-              <p><strong>Status:</strong> <span className={viewStudent.status === 'APPROVED' ? 'text-success font-semibold' : 'text-warning font-semibold'}>{viewStudent.status || 'PENDING'}</span></p>
-              <p><strong>Address:</strong> {viewStudent.address || '-'}</p>
-              <p><strong>School Name:</strong> {viewStudent.school_name || '-'}</p>
-              <p><strong>Parent Name:</strong> {viewStudent.parent_name || '-'}</p>
-              <p><strong>Parent Phone:</strong> {viewStudent.parent_phone || '-'}</p>
-              <p><strong>Enrolled Date:</strong> {new Date(viewStudent.created_at).toLocaleString()}</p>
-            </div>
+      <DialogContent className="max-w-[850px] h-[80vh] p-0 flex flex-col gap-0 overflow-hidden bg-background border-border/50">
+        <div className="px-6 py-5 border-b border-border/60 bg-card flex flex-row items-center justify-between z-10 shadow-sm shrink-0">
+          <div className="flex items-center gap-4 text-left">
+             <div className="w-14 h-14 rounded-full bg-success/10 text-success flex items-center justify-center text-2xl font-bold border border-success/20 shadow-sm">
+               {viewStudent?.name?.charAt(0).toUpperCase() || 'S'}
+             </div>
+             <div>
+               <DialogTitle className="text-2xl font-bold text-foreground flex items-center gap-3 m-0">
+                 {viewStudent?.name}
+                 <span className={`px-2.5 py-0.5 text-[10px] uppercase tracking-wider rounded-full font-bold ${viewStudent?.status === 'APPROVED' ? 'bg-success/15 text-success' : 'bg-warning/15 text-warning'}`}>
+                   {viewStudent?.status || 'PENDING'}
+                 </span>
+               </DialogTitle>
+               <p className="text-sm text-muted-foreground font-medium mt-1">
+                 Student Details & Enrollment Info
+               </p>
+             </div>
           </div>
-        )}
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-8 bg-muted/10">
+          {viewStudent && (
+            <div className="space-y-6 max-w-3xl mx-auto pb-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
+                  <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 border-b border-border/60 pb-3">
+                    <UserCircle className="w-5 h-5 text-primary" />
+                    Student Profile
+                  </h4>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between"><span className="text-muted-foreground">Enrollment ID:</span> <span className="font-medium bg-primary/10 text-primary px-2 py-0.5 rounded">{viewStudent.enrollment_id || '-'}</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">Email:</span> <span className="font-medium">{viewStudent.email}</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">Phone:</span> <span className="font-medium">{viewStudent.phone}</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">Address:</span> <span className="font-medium text-right max-w-[200px]">{viewStudent.address || '-'}</span></div>
+                    <div className="flex justify-between"><span className="text-muted-foreground">Enrolled On:</span> <span className="font-medium">{new Date(viewStudent.created_at).toLocaleString()}</span></div>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
+                    <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 border-b border-border/60 pb-3">
+                      <BookOpen className="w-5 h-5 text-success" />
+                      Academic Info
+                    </h4>
+                    <div className="space-y-3 text-sm">
+                      <div className="flex justify-between"><span className="text-muted-foreground">Course:</span> <span className="font-medium text-right max-w-[200px]">{viewStudent.course?.title || '-'}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">Class:</span> <span className="font-medium">{viewStudent.class || '-'}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">School Name:</span> <span className="font-medium text-right max-w-[200px]">{viewStudent.school_name || '-'}</span></div>
+                    </div>
+                  </div>
+
+                  <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
+                    <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 border-b border-border/60 pb-3">
+                      <Users className="w-5 h-5 text-warning" />
+                      Parent Details
+                    </h4>
+                    <div className="space-y-3 text-sm">
+                      <div className="flex justify-between"><span className="text-muted-foreground">Parent Name:</span> <span className="font-medium">{viewStudent.parent_name || '-'}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">Parent Phone:</span> <span className="font-medium">{viewStudent.parent_phone || '-'}</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   </div>
