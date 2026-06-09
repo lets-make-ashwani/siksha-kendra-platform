@@ -12,7 +12,7 @@ export const Logo: React.FC<{ className?: string }> = ({ className = "" }) => {
 
       <div className="flex flex-col leading-none text-left">
         <div className="text-[16px] md:text-[20px] font-[800] text-[#071b4d]">
-          Topper's
+          Topper'<span className="text-primary">s</span>
         </div>
 
         <div className="text-[22px] md:text-[28px] font-[900] text-[#071b4d] mt-[2px]">
