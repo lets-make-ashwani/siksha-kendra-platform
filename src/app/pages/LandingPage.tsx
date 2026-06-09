@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
 import { GraduationCap, BookOpen, Users, Award, TrendingUp, CheckCircle, Star } from 'lucide-react';
-import Navbar from '../components/Navbar';
+import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
 import Card from '../components/Card';
@@ -8,7 +8,8 @@ import { PopularCourses } from './PopularCourses';
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex flex-col bg-background">
+      <Header />
       <section className="relative overflow-hidden bg-gradient-to-br from-primary-light via-background to-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">

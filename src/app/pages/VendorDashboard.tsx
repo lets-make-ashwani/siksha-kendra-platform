@@ -1,6 +1,6 @@
-import { Routes, Route, Navigate, useNavigate } from 'react-router';
+import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router';
 import { useState, useEffect } from 'react';
-import { BarChart3, Users, Clock, UserCircle, Settings, Copy, Share2, QrCode, LogOut, IndianRupee, BookOpen } from 'lucide-react';
+import { ArrowLeft, BarChart3, Users, Clock, UserCircle, Settings, Copy, Share2, QrCode, LogOut, IndianRupee, BookOpen } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import Sidebar from '../components/Sidebar';
 import StatCard from '../components/StatCard';
@@ -17,6 +17,76 @@ const sidebarItems = [
   { icon: LogOut, label: 'Logout', path: '/logout' }
 ];
 
+const StudentDetailsPage = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const viewStudent = location.state?.student;
+
+  if (!viewStudent) return <Navigate to="/vendor/students" replace />;
+
+  return (
+    <div className="p-6 max-w-6xl mx-auto flex flex-col h-full">
+      <div className="mb-6 flex items-center gap-4">
+        <Button variant="outline" onClick={() => navigate(-1)} className="flex items-center gap-2 shrink-0">
+          <ArrowLeft className="w-4 h-4" /> Back
+        </Button>
+        <h1 className="text-3xl font-bold text-foreground">Student Details</h1>
+      </div>
+
+      <div className="flex-1 bg-card border border-border/60 rounded-xl shadow-sm overflow-hidden flex flex-col">
+        <div className="px-8 py-6 border-b border-border/60 bg-muted/10 flex flex-row items-center justify-between">
+          <div className="flex items-center gap-5 text-left">
+            <div className="w-16 h-16 rounded-full bg-success/10 text-success flex items-center justify-center text-3xl font-bold border border-success/20 shadow-sm">
+              {viewStudent?.name?.charAt(0).toUpperCase() || 'S'}
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-foreground flex items-center gap-3 m-0">
+                {viewStudent?.name}
+                <span className={`px-2.5 py-0.5 text-[10px] uppercase tracking-wider rounded-full font-bold ${viewStudent?.status === 'APPROVED' ? 'bg-success/15 text-success' : 'bg-warning/15 text-warning'}`}>
+                  {viewStudent?.status || 'PENDING'}
+                </span>
+              </h2>
+              <p className="text-sm text-muted-foreground font-medium mt-1">
+                Enrollment ID: {viewStudent.enrollment_id || '-'} &bull; Enrolled {new Date(viewStudent.created_at).toLocaleDateString()}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-8 flex-1">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
+            <div className="bg-muted/10 border border-border/60 rounded-xl p-6 shadow-sm">
+              <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 border-b border-border/60 pb-3"><UserCircle className="w-5 h-5 text-primary" /> Student Profile</h4>
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between"><span className="text-muted-foreground">Email:</span> <span className="font-medium">{viewStudent.email}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Phone:</span> <span className="font-medium">{viewStudent.phone}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Address:</span> <span className="font-medium text-right max-w-[200px]">{viewStudent.address || '-'}</span></div>
+              </div>
+            </div>
+            <div className="space-y-6">
+              <div className="bg-muted/10 border border-border/60 rounded-xl p-6 shadow-sm">
+                <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 border-b border-border/60 pb-3"><BookOpen className="w-5 h-5 text-success" /> Academic Info</h4>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between"><span className="text-muted-foreground">Course:</span> <span className="font-medium text-right max-w-[200px]">{viewStudent.course?.title || '-'}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Class:</span> <span className="font-medium">{viewStudent.class || '-'}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">School:</span> <span className="font-medium text-right max-w-[200px]">{viewStudent.school_name || '-'}</span></div>
+                </div>
+              </div>
+              <div className="bg-muted/10 border border-border/60 rounded-xl p-6 shadow-sm">
+                <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 border-b border-border/60 pb-3"><Users className="w-5 h-5 text-warning" /> Parent Details</h4>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between"><span className="text-muted-foreground">Parent Name:</span> <span className="font-medium">{viewStudent.parent_name || '-'}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Parent Phone:</span> <span className="font-medium">{viewStudent.parent_phone || '-'}</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Dashboard = () => {
   const [stats, setStats] = useState({
     totalStudents: 0,
@@ -27,9 +97,9 @@ const Dashboard = () => {
   const [recentStudents, setRecentStudents] = useState<any[]>([]);
   const [showQR, setShowQR] = useState(false);
   const [chartData, setChartData] = useState<any[]>([]);
-  const [viewStudent, setViewStudent] = useState<any>(null);
   const [totalEarnings, setTotalEarnings] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -242,7 +312,7 @@ const Dashboard = () => {
               ) : recentStudents.map((student, idx) => (
                 <tr key={idx} className="border-b border-border">
                   <td className="py-3 px-4">
-                    <button onClick={() => setViewStudent(student)} className="text-primary font-medium hover:underline text-left focus:outline-none">
+                    <button onClick={() => navigate(`/vendor/students/${student.id}`, { state: { student } })} className="text-primary font-medium hover:underline text-left focus:outline-none">
                       {student.name}
                     </button>
                   </td>
@@ -256,7 +326,7 @@ const Dashboard = () => {
                   </td>
                   <td className="py-3 px-4 text-muted-foreground">{new Date(student.created_at).toLocaleDateString()}</td>
                   <td className="py-3 px-4">
-                    <Button size="sm" variant="outline" onClick={() => setViewStudent(student)}>Details</Button>
+                    <Button size="sm" variant="outline" onClick={() => navigate(`/vendor/students/${student.id}`, { state: { student } })}>Details</Button>
                   </td>
                 </tr>
               ))}
@@ -264,84 +334,14 @@ const Dashboard = () => {
           </table>
         </div>
       </Card>
-
-      <Dialog open={!!viewStudent} onOpenChange={(open) => !open && setViewStudent(null)}>
-        <DialogContent className="max-w-[850px] h-[80vh] p-0 flex flex-col gap-0 overflow-hidden bg-background border-border/50">
-          <div className="px-6 py-5 border-b border-border/60 bg-card flex flex-row items-center justify-between z-10 shadow-sm shrink-0">
-            <div className="flex items-center gap-4 text-left">
-               <div className="w-14 h-14 rounded-full bg-success/10 text-success flex items-center justify-center text-2xl font-bold border border-success/20 shadow-sm">
-                 {viewStudent?.name?.charAt(0).toUpperCase() || 'S'}
-               </div>
-               <div>
-                 <DialogTitle className="text-2xl font-bold text-foreground flex items-center gap-3 m-0">
-                   {viewStudent?.name}
-                   <span className={`px-2.5 py-0.5 text-[10px] uppercase tracking-wider rounded-full font-bold ${viewStudent?.status === 'APPROVED' ? 'bg-success/15 text-success' : 'bg-warning/15 text-warning'}`}>
-                     {viewStudent?.status || 'PENDING'}
-                   </span>
-                 </DialogTitle>
-                 <p className="text-sm text-muted-foreground font-medium mt-1">
-                   Student Details & Enrollment Info
-                 </p>
-               </div>
-            </div>
-          </div>
-
-          <div className="flex-1 overflow-y-auto p-8 bg-muted/10">
-            {viewStudent && (
-              <div className="space-y-6 max-w-3xl mx-auto pb-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
-                    <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 border-b border-border/60 pb-3">
-                      <UserCircle className="w-5 h-5 text-primary" />
-                      Student Profile
-                    </h4>
-                    <div className="space-y-3 text-sm">
-                      <div className="flex justify-between"><span className="text-muted-foreground">Enrollment ID:</span> <span className="font-medium bg-primary/10 text-primary px-2 py-0.5 rounded">{viewStudent.enrollment_id || '-'}</span></div>
-                      <div className="flex justify-between"><span className="text-muted-foreground">Email:</span> <span className="font-medium">{viewStudent.email}</span></div>
-                      <div className="flex justify-between"><span className="text-muted-foreground">Phone:</span> <span className="font-medium">{viewStudent.phone}</span></div>
-                      <div className="flex justify-between"><span className="text-muted-foreground">Address:</span> <span className="font-medium text-right max-w-[200px]">{viewStudent.address || '-'}</span></div>
-                      <div className="flex justify-between"><span className="text-muted-foreground">Enrolled On:</span> <span className="font-medium">{new Date(viewStudent.created_at).toLocaleString()}</span></div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-6">
-                    <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
-                      <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 border-b border-border/60 pb-3">
-                        <BookOpen className="w-5 h-5 text-success" />
-                        Academic Info
-                      </h4>
-                      <div className="space-y-3 text-sm">
-                        <div className="flex justify-between"><span className="text-muted-foreground">Course:</span> <span className="font-medium text-right max-w-[200px]">{viewStudent.course?.title || '-'}</span></div>
-                        <div className="flex justify-between"><span className="text-muted-foreground">Class:</span> <span className="font-medium">{viewStudent.class || '-'}</span></div>
-                        <div className="flex justify-between"><span className="text-muted-foreground">School Name:</span> <span className="font-medium text-right max-w-[200px]">{viewStudent.school_name || '-'}</span></div>
-                      </div>
-                    </div>
-
-                    <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
-                      <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 border-b border-border/60 pb-3">
-                        <Users className="w-5 h-5 text-warning" />
-                        Parent Details
-                      </h4>
-                      <div className="space-y-3 text-sm">
-                        <div className="flex justify-between"><span className="text-muted-foreground">Parent Name:</span> <span className="font-medium">{viewStudent.parent_name || '-'}</span></div>
-                        <div className="flex justify-between"><span className="text-muted-foreground">Parent Phone:</span> <span className="font-medium">{viewStudent.parent_phone || '-'}</span></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
 
 const StudentList = () => {
   const [students, setStudents] = useState<any[]>([]);
-  const [viewStudent, setViewStudent] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -405,7 +405,7 @@ const StudentList = () => {
             ) : students.map((student) => (
               <tr key={student.id} className="border-b border-border hover:bg-muted/50 transition-colors">
                 <td className="py-3 px-4">
-                  <button onClick={() => setViewStudent(student)} className="text-primary font-medium hover:underline text-left focus:outline-none">
+                  <button onClick={() => navigate(`/vendor/students/${student.id}`, { state: { student } })} className="text-primary font-medium hover:underline text-left focus:outline-none">
                     {student.name}
                   </button>
                 </td>
@@ -420,7 +420,7 @@ const StudentList = () => {
                 </td>
                 <td className="py-3 px-4 text-muted-foreground">{new Date(student.created_at).toLocaleDateString()}</td>
                 <td className="py-3 px-4">
-                  <Button size="sm" variant="outline" onClick={() => setViewStudent(student)}>Details</Button>
+                  <Button size="sm" variant="outline" onClick={() => navigate(`/vendor/students/${student.id}`, { state: { student } })}>Details</Button>
                 </td>
               </tr>
             ))}
@@ -428,76 +428,6 @@ const StudentList = () => {
         </table>
       </div>
     </Card>
-
-    <Dialog open={!!viewStudent} onOpenChange={(open) => !open && setViewStudent(null)}>
-      <DialogContent className="max-w-[850px] h-[80vh] p-0 flex flex-col gap-0 overflow-hidden bg-background border-border/50">
-        <div className="px-6 py-5 border-b border-border/60 bg-card flex flex-row items-center justify-between z-10 shadow-sm shrink-0">
-          <div className="flex items-center gap-4 text-left">
-             <div className="w-14 h-14 rounded-full bg-success/10 text-success flex items-center justify-center text-2xl font-bold border border-success/20 shadow-sm">
-               {viewStudent?.name?.charAt(0).toUpperCase() || 'S'}
-             </div>
-             <div>
-               <DialogTitle className="text-2xl font-bold text-foreground flex items-center gap-3 m-0">
-                 {viewStudent?.name}
-                 <span className={`px-2.5 py-0.5 text-[10px] uppercase tracking-wider rounded-full font-bold ${viewStudent?.status === 'APPROVED' ? 'bg-success/15 text-success' : 'bg-warning/15 text-warning'}`}>
-                   {viewStudent?.status || 'PENDING'}
-                 </span>
-               </DialogTitle>
-               <p className="text-sm text-muted-foreground font-medium mt-1">
-                 Student Details & Enrollment Info
-               </p>
-             </div>
-          </div>
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-8 bg-muted/10">
-          {viewStudent && (
-            <div className="space-y-6 max-w-3xl mx-auto pb-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
-                  <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 border-b border-border/60 pb-3">
-                    <UserCircle className="w-5 h-5 text-primary" />
-                    Student Profile
-                  </h4>
-                  <div className="space-y-3 text-sm">
-                    <div className="flex justify-between"><span className="text-muted-foreground">Enrollment ID:</span> <span className="font-medium bg-primary/10 text-primary px-2 py-0.5 rounded">{viewStudent.enrollment_id || '-'}</span></div>
-                    <div className="flex justify-between"><span className="text-muted-foreground">Email:</span> <span className="font-medium">{viewStudent.email}</span></div>
-                    <div className="flex justify-between"><span className="text-muted-foreground">Phone:</span> <span className="font-medium">{viewStudent.phone}</span></div>
-                    <div className="flex justify-between"><span className="text-muted-foreground">Address:</span> <span className="font-medium text-right max-w-[200px]">{viewStudent.address || '-'}</span></div>
-                    <div className="flex justify-between"><span className="text-muted-foreground">Enrolled On:</span> <span className="font-medium">{new Date(viewStudent.created_at).toLocaleString()}</span></div>
-                  </div>
-                </div>
-
-                <div className="space-y-6">
-                  <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
-                    <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 border-b border-border/60 pb-3">
-                      <BookOpen className="w-5 h-5 text-success" />
-                      Academic Info
-                    </h4>
-                    <div className="space-y-3 text-sm">
-                      <div className="flex justify-between"><span className="text-muted-foreground">Course:</span> <span className="font-medium text-right max-w-[200px]">{viewStudent.course?.title || '-'}</span></div>
-                      <div className="flex justify-between"><span className="text-muted-foreground">Class:</span> <span className="font-medium">{viewStudent.class || '-'}</span></div>
-                      <div className="flex justify-between"><span className="text-muted-foreground">School Name:</span> <span className="font-medium text-right max-w-[200px]">{viewStudent.school_name || '-'}</span></div>
-                    </div>
-                  </div>
-
-                  <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
-                    <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 border-b border-border/60 pb-3">
-                      <Users className="w-5 h-5 text-warning" />
-                      Parent Details
-                    </h4>
-                    <div className="space-y-3 text-sm">
-                      <div className="flex justify-between"><span className="text-muted-foreground">Parent Name:</span> <span className="font-medium">{viewStudent.parent_name || '-'}</span></div>
-                      <div className="flex justify-between"><span className="text-muted-foreground">Parent Phone:</span> <span className="font-medium">{viewStudent.parent_phone || '-'}</span></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
   </div>
 )};
 
@@ -582,6 +512,7 @@ export default function VendorDashboard() {
           <Route path="/" element={<Navigate to="/vendor/dashboard" replace />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/students" element={<StudentList />} />
+          <Route path="/students/:id" element={<StudentDetailsPage />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/logout" element={<Logout />} />
         </Routes>

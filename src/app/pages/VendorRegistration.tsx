@@ -3,6 +3,7 @@ import { CheckCircle, Clock, Upload } from 'lucide-react';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import Card from '../components/Card';
+import Header from '../components/Header';
 
 export default function VendorRegistration() {
   const [submitted, setSubmitted] = useState(false);
@@ -72,8 +73,10 @@ export default function VendorRegistration() {
 
   if (submitted) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-primary-light to-accent flex items-center justify-center p-4">
-        <Card className="max-w-md w-full text-center">
+      <div className="min-h-screen flex flex-col bg-background">
+        <Header />
+        <div className="flex-1 bg-gradient-to-br from-primary-light to-accent flex items-center justify-center p-4">
+          <Card className="max-w-md w-full text-center">
           <div className="w-20 h-20 bg-warning rounded-full flex items-center justify-center mx-auto mb-6">
             <Clock className="w-12 h-12 text-warning-foreground" />
           </div>
@@ -98,21 +101,18 @@ export default function VendorRegistration() {
               </li>
             </ul>
           </div>
-        </Card>
+          </Card>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-primary-light to-accent py-12">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex flex-col bg-background">
+      <Header />
+      <div className="flex-1 bg-gradient-to-br from-primary-light to-accent py-12">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <img src="/TKS.png" alt="Topper's Siksha Kendra Logo" className="w-12 h-12 object-contain" />
-            <span className="text-2xl font-bold text-foreground">
-              Topper<span className="text-primary">'s</span> Shiksha <span className="text-primary">Kendra</span>
-            </span>
-          </div>
           <h1 className="text-4xl font-bold text-foreground mb-3">
             Become a Topper<span className="text-primary">'s</span> Shiksha <span className="text-primary">Kendra</span> Vendor
           </h1>
@@ -417,6 +417,7 @@ export default function VendorRegistration() {
         <p className="text-center text-sm text-muted-foreground mt-6">
           By submitting this application, you agree to our Vendor Terms of Service and Privacy Policy
         </p>
+        </div>
       </div>
     </div>
   );
