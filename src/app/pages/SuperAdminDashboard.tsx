@@ -430,16 +430,12 @@ const VendorManagement = () => {
   const [vendors, setVendors] = useState<any[]>([]);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [viewVendorPerformance, setViewVendorPerformance] = useState<any>(null);
-  const [viewVendorDetails, setViewVendorDetails] = useState<any>(null);
-  const [isEditingCommission, setIsEditingCommission] = useState(false);
-  const [editCommissionValue, setEditCommissionValue] = useState('');
   const [newVendorCreds, setNewVendorCreds] = useState<any>(null);
   const [formData, setFormData] = useState({
     name: '', email: '', phone: '', address: '', city: '', state: '', pincode: ''
   });
-  const [fullScreenImage, setFullScreenImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   const fetchVendors = async () => {
       try {
@@ -485,35 +481,6 @@ const VendorManagement = () => {
       }
     } catch (err) {
       toast.error('Error deleting vendor');
-    }
-  };
-
-  const handleUpdateCommission = async (id: string) => {
-    try {
-      const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      const apiUrl = rawApiUrl.replace(/\/$/, '');
-      const token = localStorage.getItem('token');
-      
-      const response = await fetch(`${apiUrl}/api/admin/vendors/${id}/commission`, {
-        method: 'PATCH',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` 
-        },
-        body: JSON.stringify({ commission_rate: editCommissionValue })
-      });
-      
-      if (response.ok) {
-        toast.success('Commission rate updated successfully');
-        setIsEditingCommission(false);
-        setViewVendorDetails({ ...viewVendorDetails, commission_rate: parseFloat(editCommissionValue) || 0 });
-        fetchVendors(); // Refresh the main table
-      } else {
-        const data = await response.json();
-        toast.error(data.message || 'Failed to update commission');
-      }
-    } catch (error) {
-      toast.error('Error updating commission');
     }
   };
 
@@ -600,7 +567,7 @@ const VendorManagement = () => {
               <tr key={vendor.id} className="border-b border-border hover:bg-muted/50 transition-colors">
                 <td className="py-3 px-4 text-foreground">{vendor.vendor_id}</td>
                 <td className="py-3 px-4">
-                  <button onClick={() => setViewVendorPerformance(vendor)} className="text-primary font-medium hover:underline text-left focus:outline-none">
+                  <button onClick={() => navigate(`/admin/vendors/${vendor.id}`, { state: { vendor, tab: 'performance' } })} className="text-primary font-medium hover:underline text-left focus:outline-none">
                     {vendor.user?.name}
                   </button>
                 </td>
@@ -614,7 +581,7 @@ const VendorManagement = () => {
                 </td>
                 <td className="py-3 px-4">
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline" onClick={() => setViewVendorDetails(vendor)}>Details</Button>
+                    <Button size="sm" variant="outline" onClick={() => navigate(`/admin/vendors/${vendor.id}`, { state: { vendor, tab: 'details' } })}>Details</Button>
                     <Button size="sm" variant="danger" onClick={() => handleDeleteVendor(vendor.id)}>Delete</Button>
                   </div>
                 </td>
@@ -673,401 +640,6 @@ const VendorManagement = () => {
           <Button className="w-full" onClick={() => copyToClipboard(newVendorCreds?.messageToForward || '')}>
             Copy Message to Share
           </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
-
-    <Dialog open={!!viewVendorPerformance} onOpenChange={(open) => !open && setViewVendorPerformance(null)}>
-      <DialogContent className="max-w-[1400px] w-[95vw] h-[95vh] p-0 flex flex-col gap-0 overflow-hidden bg-background border-border/50">
-        {/* STICKY PREMIUM HEADER */}
-        <div className="px-6 py-5 border-b border-border/60 bg-card flex flex-row items-center justify-between z-10 shadow-sm shrink-0">
-          <div className="flex items-center gap-4 text-left">
-             <div className="w-14 h-14 rounded-full bg-primary/10 text-primary flex items-center justify-center text-2xl font-bold border border-primary/20 shadow-sm">
-               {viewVendorPerformance?.user?.name?.charAt(0).toUpperCase()}
-             </div>
-             <div>
-               <DialogTitle className="text-2xl font-bold text-foreground flex items-center gap-3 m-0">
-                 {viewVendorPerformance?.user?.name}
-                 <span className={`px-2.5 py-0.5 text-[10px] uppercase tracking-wider rounded-full font-bold ${viewVendorPerformance?.status === 'ACTIVE' ? 'bg-success/15 text-success' : 'bg-destructive/15 text-destructive'}`}>
-                   {viewVendorPerformance?.status}
-                 </span>
-               </DialogTitle>
-               <p className="text-sm text-muted-foreground font-medium mt-1">
-                 Vendor ID: {viewVendorPerformance?.vendor_id} &bull; Joined {new Date(viewVendorPerformance?.created_at).toLocaleDateString()}
-               </p>
-             </div>
-          </div>
-          <div className="flex items-center gap-3 pr-8">
-             <Button variant="danger" onClick={() => { handleDeleteVendor(viewVendorPerformance.id); setViewVendorPerformance(null); }} className="shadow-sm">
-               <XCircle className="w-4 h-4 mr-2" />
-               Delete Vendor
-             </Button>
-          </div>
-        </div>
-        
-        {/* SCROLLABLE DASHBOARD CONTENT */}
-        <div className="flex-1 overflow-y-auto p-6 bg-muted/10">
-        {viewVendorPerformance && (() => {
-          const vendorStudents = viewVendorPerformance.studentLeads || [];
-          const totalReferred = vendorStudents.length;
-          const approvedCount = vendorStudents.filter((s: any) => s.status === 'APPROVED').length;
-          const pendingCount = vendorStudents.filter((s: any) => s.status !== 'APPROVED').length;
-          const totalEarnings = approvedCount * (viewVendorPerformance.commission_rate || 0);
-          const conversionRate = totalReferred > 0 ? ((approvedCount / totalReferred) * 100).toFixed(1) : '0.0';
-          
-          const currentYear = new Date().getFullYear();
-          const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-          const counts = new Array(12).fill(0);
-          
-          let monthlyStudents = 0;
-          let todaysStudents = 0;
-          const today = new Date();
-          
-          vendorStudents.forEach((student: any) => {
-            const date = new Date(student.created_at);
-            if (date.getFullYear() === currentYear) {
-              counts[date.getMonth()] += 1;
-              if (date.getMonth() === today.getMonth()) {
-                monthlyStudents += 1;
-              }
-            }
-            if (date.toDateString() === today.toDateString()) {
-              todaysStudents += 1;
-            }
-          });
-          
-          const currentMonth = new Date().getMonth();
-          const vendorChartData = months.slice(0, currentMonth + 1).map((month, idx) => ({ month, students: counts[idx] }));
-
-          return (
-            <div className="space-y-6 w-full max-w-full mx-auto pb-4 px-2">
-              
-              {/* KPI CARDS (SaaS Style) */}
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                <div className="bg-card border border-border/60 rounded-xl p-5 shadow-sm relative overflow-hidden group hover:-translate-y-1 hover:shadow-md transition-all duration-300">
-                  <div className="flex justify-between items-start mb-2">
-                    <p className="text-sm font-medium text-muted-foreground">Total Referrals</p>
-                    <div className="bg-primary/10 p-2 rounded-lg text-primary group-hover:scale-110 transition-transform"><Users className="w-4 h-4" /></div>
-                  </div>
-                  <p className="text-3xl font-bold text-foreground">{totalReferred}</p>
-                </div>
-                
-                <div className="bg-card border border-border/60 rounded-xl p-5 shadow-sm relative overflow-hidden group hover:-translate-y-1 hover:shadow-md transition-all duration-300">
-                  <div className="flex justify-between items-start mb-2">
-                    <p className="text-sm font-medium text-muted-foreground">Monthly Referrals</p>
-                    <div className="bg-[#0B1B52]/10 p-2 rounded-lg text-[#0B1B52] group-hover:scale-110 transition-transform"><Calendar className="w-4 h-4" /></div>
-                  </div>
-                  <p className="text-3xl font-bold text-foreground">{monthlyStudents}</p>
-                </div>
-                
-                <div className="bg-card border border-border/60 rounded-xl p-5 shadow-sm relative overflow-hidden group hover:-translate-y-1 hover:shadow-md transition-all duration-300">
-                  <div className="flex justify-between items-start mb-2">
-                    <p className="text-sm font-medium text-muted-foreground">Today's Leads</p>
-                    <div className="bg-warning/10 p-2 rounded-lg text-warning group-hover:scale-110 transition-transform"><Clock className="w-4 h-4" /></div>
-                  </div>
-                  <p className="text-3xl font-bold text-foreground">{todaysStudents}</p>
-                </div>
-                
-                <div className="bg-card border border-border/60 rounded-xl p-5 shadow-sm relative overflow-hidden group hover:-translate-y-1 hover:shadow-md transition-all duration-300">
-                  <div className="flex justify-between items-start mb-2">
-                    <p className="text-sm font-medium text-muted-foreground">Approved Admissions</p>
-                    <div className="bg-success/10 p-2 rounded-lg text-success group-hover:scale-110 transition-transform"><CheckCircle className="w-4 h-4" /></div>
-                  </div>
-                  <p className="text-3xl font-bold text-foreground">{approvedCount}</p>
-                </div>
-                
-                <div className="bg-card border border-[#10B981]/40 rounded-xl p-5 shadow-sm relative overflow-hidden group hover:-translate-y-1 hover:shadow-md transition-all duration-300 bg-gradient-to-br from-card to-[#10B981]/5">
-                  <div className="flex justify-between items-start mb-2">
-                    <p className="text-sm font-medium text-[#10B981]">Total Earnings</p>
-                    <div className="bg-[#10B981]/15 p-2 rounded-lg text-[#10B981] group-hover:scale-110 transition-transform"><IndianRupee className="w-4 h-4" /></div>
-                  </div>
-                  <p className="text-3xl font-bold text-foreground">₹{totalEarnings.toLocaleString('en-IN')}</p>
-                </div>
-              </div>
-
-              {/* MIDDLE SECTION: Chart & Overviews */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                
-                {/* CHART CONTAINER */}
-                <div className="col-span-1 lg:col-span-2 bg-card border border-border/60 rounded-xl p-6 shadow-sm">
-                  <h4 className="font-semibold mb-6 text-foreground flex items-center gap-2">
-                    <BarChart3 className="w-5 h-5 text-primary" />
-                    Growth & Performance
-                  </h4>
-                  {totalReferred === 0 ? (
-                    <div className="flex flex-col items-center justify-center h-[260px] bg-muted/20 rounded-xl border-2 border-dashed border-border/60">
-                      <BarChart3 className="w-12 h-12 text-muted-foreground/30 mb-4" />
-                      <p className="text-muted-foreground font-semibold text-lg">No Performance Data</p>
-                      <p className="text-sm text-muted-foreground mb-6">This vendor hasn't generated any referrals yet.</p>
-                      <Button variant="outline" size="sm" onClick={() => copyToClipboard(`${window.location.origin}/enroll/${viewVendorPerformance.referral_code}`)}>
-                        <Copy className="w-4 h-4 mr-2" /> Share Referral Link
-                      </Button>
-                    </div>
-                  ) : (
-                    <ResponsiveContainer width="100%" height={260}>
-                      <BarChart data={vendorChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" vertical={false} />
-                        <XAxis dataKey="month" stroke="#6B7280" fontSize={12} tickLine={false} axisLine={false} />
-                        <YAxis stroke="#6B7280" fontSize={12} tickLine={false} axisLine={false} />
-                        <Tooltip cursor={{ fill: 'rgba(0,0,0,0.04)' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                        <Bar dataKey="students" fill="#F97316" radius={[6, 6, 0, 0]} maxBarSize={50} />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  )}
-                </div>
-
-                {/* EARNINGS & REFERRAL LINK SIDEBAR */}
-                <div className="col-span-1 space-y-6">
-                  {/* Overview Card */}
-                  <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-[100px] -z-10"></div>
-                    <h4 className="font-semibold text-foreground mb-5 flex items-center gap-2">
-                      <Wallet className="w-5 h-5 text-primary" />
-                      Earnings Overview
-                    </h4>
-                    <div className="space-y-5 z-10 relative">
-                      <div className="flex justify-between items-end">
-                        <span className="text-sm text-muted-foreground font-medium">Total Payout</span>
-                        <span className="text-2xl font-bold text-success tracking-tight">₹{totalEarnings.toLocaleString('en-IN')}</span>
-                      </div>
-                      <div className="flex justify-between items-end">
-                        <span className="text-sm text-muted-foreground font-medium">Commission Rate</span>
-                        <span className="text-sm font-bold bg-muted px-2 py-1 rounded-md">₹{viewVendorPerformance.commission_rate || 0} / admit</span>
-                      </div>
-                      <div className="w-full h-px bg-border/60 my-2"></div>
-                      <div className="flex justify-between items-end">
-                        <span className="text-sm text-muted-foreground font-medium">Conversion Rate</span>
-                        <span className="text-lg font-bold text-primary flex items-center"><Percent className="w-4 h-4 mr-0.5" />{conversionRate}%</span>
-                      </div>
-                      <div className="w-full bg-muted rounded-full h-2.5 mt-2 overflow-hidden border border-border/40">
-                        <div className="bg-primary h-full rounded-full transition-all duration-1000 ease-out" style={{ width: `${Math.min(Number(conversionRate), 100)}%` }}></div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Referral Link Card */}
-                  <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
-                    <h4 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider text-muted-foreground">Vendor Link</h4>
-                    <div className="flex items-center gap-2 bg-muted/40 p-1.5 rounded-lg border border-border/60">
-                      <input type="text" readOnly value={`${window.location.origin}/enroll/${viewVendorPerformance.referral_code}`} className="bg-transparent border-none outline-none text-xs w-full text-muted-foreground px-2 font-mono" />
-                      <Button size="sm" variant="outline" className="shrink-0 h-8" onClick={() => copyToClipboard(`${window.location.origin}/enroll/${viewVendorPerformance.referral_code}`)}>
-                        Copy
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* TABLE SECTION */}
-              <div className="bg-card border border-border/60 rounded-xl shadow-sm overflow-hidden mt-6">
-                <div className="px-6 py-4 border-b border-border/60 bg-muted/10 flex justify-between items-center">
-                  <h4 className="font-semibold text-foreground">Referred Students List</h4>
-                  <span className="text-xs font-bold bg-primary/10 text-primary px-3 py-1 rounded-full">{vendorStudents.length} Enrollments</span>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead className="bg-muted/30">
-                      <tr className="border-b border-border">
-                        <th className="text-left py-4 px-6 font-semibold text-foreground">Student Name</th>
-                        <th className="text-left py-4 px-6 font-semibold text-foreground">Phone</th>
-                        <th className="text-left py-4 px-6 font-semibold text-foreground">Class & Course</th>
-                        <th className="text-left py-4 px-6 font-semibold text-foreground">Status</th>
-                        <th className="text-left py-4 px-6 font-semibold text-foreground">Date</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {vendorStudents.length === 0 ? (
-                        <tr>
-                          <td colSpan={5} className="py-12 text-center">
-                            <div className="flex flex-col items-center justify-center">
-                              <Users className="w-10 h-10 text-muted-foreground/30 mb-3" />
-                              <p className="text-muted-foreground font-medium">No students found</p>
-                              <p className="text-sm text-muted-foreground/70">When this vendor refers students, they will appear here.</p>
-                            </div>
-                          </td>
-                        </tr>
-                      ) : vendorStudents.map((student: any, idx: number) => (
-                        <tr key={idx} className="border-b border-border hover:bg-muted/50 transition-colors">
-                          <td className="py-4 px-6 text-foreground font-medium">{student.name}</td>
-                          <td className="py-4 px-6 text-muted-foreground">{student.phone}</td>
-                          <td className="py-4 px-6">
-                            <p className="text-foreground">{student.course?.title || 'Unknown'}</p>
-                            <p className="text-xs text-muted-foreground mt-0.5">{student.class || '-'}</p>
-                          </td>
-                          <td className="py-4 px-6">
-                            <span className={`px-2 py-1 rounded-[6px] text-xs font-semibold ${student.status === 'APPROVED' ? 'bg-success/20 text-success' : 'bg-warning/20 text-warning'}`}>
-                              {student.status || 'PENDING'}
-                            </span>
-                          </td>
-                          <td className="py-4 px-6 text-muted-foreground">{new Date(student.created_at).toLocaleDateString()}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          );
-        })()}
-        </div>
-      </DialogContent>
-    </Dialog>
-
-    <Dialog open={!!viewVendorDetails} onOpenChange={(open) => { if (!open) { setViewVendorDetails(null); setIsEditingCommission(false); }}}>
-      <DialogContent className="max-w-[1200px] w-[90vw] h-[90vh] p-0 flex flex-col gap-0 overflow-hidden bg-background border-border/50">
-        {/* STICKY PREMIUM HEADER */}
-        <div className="px-6 py-5 border-b border-border/60 bg-card flex flex-row items-center justify-between z-10 shadow-sm shrink-0">
-          <div className="flex items-center gap-4 text-left">
-             <div className="w-14 h-14 rounded-full bg-primary/10 text-primary flex items-center justify-center text-2xl font-bold border border-primary/20 shadow-sm">
-               {viewVendorDetails?.user?.name?.charAt(0).toUpperCase() || 'V'}
-             </div>
-             <div>
-               <DialogTitle className="text-2xl font-bold text-foreground flex items-center gap-3 m-0">
-                 {viewVendorDetails?.user?.name}
-                 <span className={`px-2.5 py-0.5 text-[10px] uppercase tracking-wider rounded-full font-bold ${viewVendorDetails?.status === 'ACTIVE' ? 'bg-success/15 text-success' : 'bg-destructive/15 text-destructive'}`}>
-                   {viewVendorDetails?.status}
-                 </span>
-               </DialogTitle>
-               <p className="text-sm text-muted-foreground font-medium mt-1">
-                 Vendor Profile & Basic Information
-               </p>
-             </div>
-          </div>
-          <div className="flex items-center gap-3 pr-8">
-            <Button variant="danger" onClick={() => { handleDeleteVendor(viewVendorDetails.id); setViewVendorDetails(null); }} className="shadow-sm">
-              <XCircle className="w-4 h-4 mr-2" />
-              Delete Vendor
-            </Button>
-          </div>
-        </div>
-
-        {/* SCROLLABLE DASHBOARD CONTENT */}
-        <div className="flex-1 overflow-y-auto p-8 bg-muted/10">
-          {viewVendorDetails && (
-            <div className="space-y-8 w-full max-w-[1152px] mx-auto pb-4 px-2">
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
-                  <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 border-b border-border/60 pb-3">
-                    <UserCircle className="w-5 h-5 text-primary" />
-                    Personal Details
-                  </h4>
-                  <div className="space-y-3 text-sm">
-                    <div className="flex justify-between"><span className="text-muted-foreground">Vendor ID:</span> <span className="font-medium">{viewVendorDetails.vendor_id}</span></div>
-                    <div className="flex justify-between"><span className="text-muted-foreground">Referral Code:</span> <span className="font-medium text-primary bg-primary/10 px-2 py-0.5 rounded">{viewVendorDetails.referral_code}</span></div>
-                    <div className="flex justify-between"><span className="text-muted-foreground">Email:</span> <span className="font-medium">{viewVendorDetails.user?.email}</span></div>
-                    <div className="flex justify-between"><span className="text-muted-foreground">Phone:</span> <span className="font-medium">{viewVendorDetails.user?.phone}</span></div>
-                    <div className="flex justify-between"><span className="text-muted-foreground">Aadhaar No:</span> <span className="font-medium">{viewVendorDetails.aadhaar_number}</span></div>
-                    <div className="flex justify-between"><span className="text-muted-foreground">PAN No:</span> <span className="font-medium">{viewVendorDetails.pan_number}</span></div>
-                  </div>
-                </div>
-
-                <div className="space-y-6">
-                  <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
-                    <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 border-b border-border/60 pb-3">
-                      <Wallet className="w-5 h-5 text-success" />
-                      Banking Details
-                    </h4>
-                    <div className="space-y-3 text-sm">
-                      <div className="flex justify-between"><span className="text-muted-foreground">Bank:</span> <span className="font-medium">{viewVendorDetails.bank_name}</span></div>
-                      <div className="flex justify-between"><span className="text-muted-foreground">Branch:</span> <span className="font-medium">{viewVendorDetails.branch_name}</span></div>
-                      <div className="flex justify-between"><span className="text-muted-foreground">Account No:</span> <span className="font-medium">{viewVendorDetails.account_number}</span></div>
-                      <div className="flex justify-between"><span className="text-muted-foreground">IFSC:</span> <span className="font-medium">{viewVendorDetails.ifsc_code}</span></div>
-                      <div className="flex justify-between items-center mt-2 pt-2 border-t border-border/40">
-                        <span className="text-muted-foreground">Commission Rate:</span> 
-                        {isEditingCommission ? (
-                          <div className="flex items-center gap-2">
-                            <input 
-                              type="number" 
-                              value={editCommissionValue} 
-                              onChange={(e) => setEditCommissionValue(e.target.value)} 
-                              className="w-20 px-2 py-1 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-background text-foreground"
-                            />
-                            <Button size="sm" onClick={() => handleUpdateCommission(viewVendorDetails.id)}>Save</Button>
-                            <Button size="sm" variant="outline" onClick={() => setIsEditingCommission(false)}>Cancel</Button>
-                          </div>
-                        ) : (
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-success bg-success/10 px-2 py-1 rounded">₹{viewVendorDetails.commission_rate || 0} / admit</span>
-                            <button onClick={() => { setEditCommissionValue(viewVendorDetails.commission_rate?.toString() || '0'); setIsEditingCommission(true); }} className="text-primary text-xs font-medium hover:underline">Edit</button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
-                    <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 border-b border-border/60 pb-3">
-                      <Copy className="w-5 h-5 text-warning" />
-                      Address Details
-                    </h4>
-                    <p className="text-sm text-foreground leading-relaxed">
-                      {viewVendorDetails.address},<br/>
-                      {viewVendorDetails.city}, {viewVendorDetails.state} - {viewVendorDetails.pincode}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-warning/10 border border-warning/20 p-4 rounded-xl flex gap-3">
-                 <Settings className="w-5 h-5 text-warning shrink-0" />
-                 <p className="text-sm text-warning-foreground">
-                   <strong>Note about Passwords:</strong> For security reasons, vendor passwords are encrypted (hashed) in the database and cannot be viewed by anyone, including Super Admins. If a vendor loses their password, they must use the "Forgot Password" flow to reset it.
-                 </p>
-              </div>
-
-              <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
-                <h4 className="font-semibold text-foreground mb-6 flex items-center gap-2 border-b border-border/60 pb-3">
-                  <Eye className="w-5 h-5 text-primary" />
-                  Uploaded Documents
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {viewVendorDetails.aadhaar_front && (
-                    <div className="border border-border/60 rounded-lg p-3 bg-muted/20 hover:bg-muted/40 transition-colors group cursor-pointer" onClick={() => setFullScreenImage(viewVendorDetails.aadhaar_front)}>
-                      <p className="text-xs text-center mb-3 font-medium text-muted-foreground group-hover:text-primary transition-colors">Aadhaar (Front)</p>
-                      <div className="aspect-[4/3] bg-black/5 rounded flex items-center justify-center overflow-hidden">
-                        <img src={viewVendorDetails.aadhaar_front} alt="Aadhaar Front" className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" />
-                      </div>
-                    </div>
-                  )}
-                  {viewVendorDetails.aadhaar_back && (
-                    <div className="border border-border/60 rounded-lg p-3 bg-muted/20 hover:bg-muted/40 transition-colors group cursor-pointer" onClick={() => setFullScreenImage(viewVendorDetails.aadhaar_back)}>
-                      <p className="text-xs text-center mb-3 font-medium text-muted-foreground group-hover:text-primary transition-colors">Aadhaar (Back)</p>
-                      <div className="aspect-[4/3] bg-black/5 rounded flex items-center justify-center overflow-hidden">
-                        <img src={viewVendorDetails.aadhaar_back} alt="Aadhaar Back" className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" />
-                      </div>
-                    </div>
-                  )}
-                  {viewVendorDetails.pan_image && (
-                    <div className="border border-border/60 rounded-lg p-3 bg-muted/20 hover:bg-muted/40 transition-colors group cursor-pointer" onClick={() => setFullScreenImage(viewVendorDetails.pan_image)}>
-                      <p className="text-xs text-center mb-3 font-medium text-muted-foreground group-hover:text-primary transition-colors">PAN Card</p>
-                      <div className="aspect-[4/3] bg-black/5 rounded flex items-center justify-center overflow-hidden">
-                        <img src={viewVendorDetails.pan_image} alt="PAN Card" className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" />
-                      </div>
-                    </div>
-                  )}
-                  {viewVendorDetails.passbook_image && (
-                    <div className="border border-border/60 rounded-lg p-3 bg-muted/20 hover:bg-muted/40 transition-colors group cursor-pointer" onClick={() => setFullScreenImage(viewVendorDetails.passbook_image)}>
-                      <p className="text-xs text-center mb-3 font-medium text-muted-foreground group-hover:text-primary transition-colors">Bank Passbook</p>
-                      <div className="aspect-[4/3] bg-black/5 rounded flex items-center justify-center overflow-hidden">
-                        <img src={viewVendorDetails.passbook_image} alt="Passbook" className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
-
-    <Dialog open={!!fullScreenImage} onOpenChange={(open) => !open && setFullScreenImage(null)}>
-      <DialogContent className="max-w-4xl">
-        <DialogHeader>
-          <DialogTitle>Document View</DialogTitle>
-        </DialogHeader>
-        <div className="mt-2 flex justify-center">
-          <img src={fullScreenImage || ''} alt="Full Document View" className="max-w-full max-h-[75vh] object-contain rounded" />
         </div>
       </DialogContent>
     </Dialog>
@@ -1143,6 +715,247 @@ const StudentDetailsPage = () => {
           </div>
         </div>
       </div>
+    </div>
+  );
+};
+
+const VendorDetailsPage = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const initialVendor = location.state?.vendor;
+  const initialTab = location.state?.tab || 'performance';
+
+  const [vendorData, setVendorData] = useState<any>(initialVendor);
+  const [activeTab, setActiveTab] = useState<'performance' | 'details'>(initialTab);
+  const [isEditingCommission, setIsEditingCommission] = useState(false);
+  const [editCommissionValue, setEditCommissionValue] = useState(initialVendor?.commission_rate?.toString() || '0');
+  const [fullScreenImage, setFullScreenImage] = useState<string | null>(null);
+
+  if (!vendorData) return <Navigate to="/admin/vendors" replace />;
+
+  const handleDeleteVendor = async (id: string) => {
+    if (!confirm('Are you sure you want to completely delete this vendor? Their student enrollments will be kept but unlinked.')) return;
+    try {
+      const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const apiUrl = rawApiUrl.replace(/\/$/, '');
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch(`${apiUrl}/api/admin/vendors/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        toast.success('Vendor deleted successfully');
+        navigate('/admin/vendors');
+      } else {
+        const data = await response.json();
+        toast.error(data.message || 'Failed to delete vendor');
+      }
+    } catch (err) {
+      toast.error('Error deleting vendor');
+    }
+  };
+
+  const handleUpdateCommission = async (id: string) => {
+    try {
+      const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const apiUrl = rawApiUrl.replace(/\/$/, '');
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch(`${apiUrl}/api/admin/vendors/${id}/commission`, {
+        method: 'PATCH',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify({ commission_rate: editCommissionValue })
+      });
+      
+      if (response.ok) {
+        toast.success('Commission rate updated successfully');
+        setIsEditingCommission(false);
+        setVendorData({ ...vendorData, commission_rate: parseFloat(editCommissionValue) || 0 });
+      } else {
+        const data = await response.json();
+        toast.error(data.message || 'Failed to update commission');
+      }
+    } catch (error) {
+      toast.error('Error updating commission');
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success('Copied to clipboard!');
+  };
+
+  // Performance Calculations
+  const vendorStudents = vendorData.studentLeads || [];
+  const totalReferred = vendorStudents.length;
+  const approvedCount = vendorStudents.filter((s: any) => s.status === 'APPROVED').length;
+  const pendingCount = vendorStudents.filter((s: any) => s.status !== 'APPROVED').length;
+  const totalEarnings = approvedCount * (vendorData.commission_rate || 0);
+  const conversionRate = totalReferred > 0 ? ((approvedCount / totalReferred) * 100).toFixed(1) : '0.0';
+  
+  const currentYear = new Date().getFullYear();
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const counts = new Array(12).fill(0);
+  
+  let monthlyStudents = 0;
+  let todaysStudents = 0;
+  const today = new Date();
+  
+  vendorStudents.forEach((student: any) => {
+    const date = new Date(student.created_at);
+    if (date.getFullYear() === currentYear) {
+      counts[date.getMonth()] += 1;
+      if (date.getMonth() === today.getMonth()) {
+        monthlyStudents += 1;
+      }
+    }
+    if (date.toDateString() === today.toDateString()) {
+      todaysStudents += 1;
+    }
+  });
+  
+  const currentMonth = new Date().getMonth();
+  const vendorChartData = months.slice(0, currentMonth + 1).map((month, idx) => ({ month, students: counts[idx] }));
+
+  return (
+    <div className="p-6 max-w-[1400px] mx-auto flex flex-col h-full">
+      <div className="mb-6 flex items-center gap-4">
+        <Button variant="outline" onClick={() => navigate(-1)} className="flex items-center gap-2 shrink-0">
+          <ArrowLeft className="w-4 h-4" /> Back
+        </Button>
+        <h1 className="text-3xl font-bold text-foreground">Vendor Details</h1>
+      </div>
+
+      <div className="flex-1 bg-card border border-border/60 rounded-xl shadow-sm overflow-hidden flex flex-col">
+        {/* HEADER */}
+        <div className="px-8 py-6 border-b border-border/60 bg-muted/10 flex flex-row items-center justify-between shrink-0">
+          <div className="flex items-center gap-5 text-left">
+             <div className="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center text-3xl font-bold border border-primary/20 shadow-sm">
+               {vendorData?.user?.name?.charAt(0).toUpperCase() || 'V'}
+             </div>
+             <div>
+               <h2 className="text-2xl font-bold text-foreground flex items-center gap-3 m-0">
+                 {vendorData?.user?.name}
+                 <span className={`px-2.5 py-0.5 text-[10px] uppercase tracking-wider rounded-full font-bold ${vendorData?.status === 'ACTIVE' ? 'bg-success/15 text-success' : 'bg-destructive/15 text-destructive'}`}>
+                   {vendorData?.status}
+                 </span>
+               </h2>
+               <p className="text-sm text-muted-foreground font-medium mt-1">
+                 Vendor ID: {vendorData?.vendor_id} &bull; Joined {new Date(vendorData?.created_at).toLocaleDateString()}
+               </p>
+             </div>
+          </div>
+          <div className="flex items-center gap-3">
+             <Button variant="danger" onClick={() => handleDeleteVendor(vendorData.id)} className="shadow-sm">
+               <XCircle className="w-4 h-4 mr-2" /> Delete Vendor
+             </Button>
+          </div>
+        </div>
+
+        {/* TABS */}
+        <div className="px-8 pt-4 border-b border-border/60 flex gap-6 bg-card shrink-0">
+          <button onClick={() => setActiveTab('performance')} className={`pb-3 font-semibold text-sm border-b-2 transition-colors ${activeTab === 'performance' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}>
+            Performance Dashboard
+          </button>
+          <button onClick={() => setActiveTab('details')} className={`pb-3 font-semibold text-sm border-b-2 transition-colors ${activeTab === 'details' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}>
+            Basic Information
+          </button>
+        </div>
+
+        {/* TAB CONTENT */}
+        <div className="p-8 flex-1 overflow-y-auto bg-muted/5">
+          {activeTab === 'performance' ? (
+            <div className="space-y-6 w-full max-w-full mx-auto pb-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                <div className="bg-card border border-border/60 rounded-xl p-5 shadow-sm relative overflow-hidden"><div className="flex justify-between items-start mb-2"><p className="text-sm font-medium text-muted-foreground">Total Referrals</p><div className="bg-primary/10 p-2 rounded-lg text-primary"><Users className="w-4 h-4" /></div></div><p className="text-3xl font-bold text-foreground">{totalReferred}</p></div>
+                <div className="bg-card border border-border/60 rounded-xl p-5 shadow-sm relative overflow-hidden"><div className="flex justify-between items-start mb-2"><p className="text-sm font-medium text-muted-foreground">Monthly Referrals</p><div className="bg-[#0B1B52]/10 p-2 rounded-lg text-[#0B1B52]"><Calendar className="w-4 h-4" /></div></div><p className="text-3xl font-bold text-foreground">{monthlyStudents}</p></div>
+                <div className="bg-card border border-border/60 rounded-xl p-5 shadow-sm relative overflow-hidden"><div className="flex justify-between items-start mb-2"><p className="text-sm font-medium text-muted-foreground">Today's Leads</p><div className="bg-warning/10 p-2 rounded-lg text-warning"><Clock className="w-4 h-4" /></div></div><p className="text-3xl font-bold text-foreground">{todaysStudents}</p></div>
+                <div className="bg-card border border-border/60 rounded-xl p-5 shadow-sm relative overflow-hidden"><div className="flex justify-between items-start mb-2"><p className="text-sm font-medium text-muted-foreground">Approved Admissions</p><div className="bg-success/10 p-2 rounded-lg text-success"><CheckCircle className="w-4 h-4" /></div></div><p className="text-3xl font-bold text-foreground">{approvedCount}</p></div>
+                <div className="bg-gradient-to-br from-card to-[#10B981]/5 border border-[#10B981]/40 rounded-xl p-5 shadow-sm relative overflow-hidden"><div className="flex justify-between items-start mb-2"><p className="text-sm font-medium text-[#10B981]">Total Earnings</p><div className="bg-[#10B981]/15 p-2 rounded-lg text-[#10B981]"><IndianRupee className="w-4 h-4" /></div></div><p className="text-3xl font-bold text-foreground">₹{totalEarnings.toLocaleString('en-IN')}</p></div>
+              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="col-span-1 lg:col-span-2 bg-card border border-border/60 rounded-xl p-6 shadow-sm">
+                  <h4 className="font-semibold mb-6 text-foreground flex items-center gap-2"><BarChart3 className="w-5 h-5 text-primary" /> Growth & Performance</h4>
+                  {totalReferred === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-[260px] bg-muted/20 rounded-xl border-2 border-dashed border-border/60"><BarChart3 className="w-12 h-12 text-muted-foreground/30 mb-4" /><p className="text-muted-foreground font-semibold text-lg">No Performance Data</p><p className="text-sm text-muted-foreground mb-6">This vendor hasn't generated any referrals yet.</p><Button variant="outline" size="sm" onClick={() => copyToClipboard(`${window.location.origin}/enroll/${vendorData.referral_code}`)}><Copy className="w-4 h-4 mr-2" /> Share Referral Link</Button></div>
+                  ) : (
+                    <ResponsiveContainer width="100%" height={260}>
+                      <BarChart data={vendorChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}><CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" vertical={false} /><XAxis dataKey="month" stroke="#6B7280" fontSize={12} tickLine={false} axisLine={false} /><YAxis stroke="#6B7280" fontSize={12} tickLine={false} axisLine={false} /><Tooltip cursor={{ fill: 'rgba(0,0,0,0.04)' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} /><Bar dataKey="students" fill="#F97316" radius={[6, 6, 0, 0]} maxBarSize={50} /></BarChart>
+                    </ResponsiveContainer>
+                  )}
+                </div>
+                <div className="col-span-1 space-y-6">
+                  <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-[100px] -z-10"></div>
+                    <h4 className="font-semibold text-foreground mb-5 flex items-center gap-2"><Wallet className="w-5 h-5 text-primary" /> Earnings Overview</h4>
+                    <div className="space-y-5 z-10 relative">
+                      <div className="flex justify-between items-end"><span className="text-sm text-muted-foreground font-medium">Total Payout</span><span className="text-2xl font-bold text-success tracking-tight">₹{totalEarnings.toLocaleString('en-IN')}</span></div>
+                      <div className="flex justify-between items-end"><span className="text-sm text-muted-foreground font-medium">Commission Rate</span><span className="text-sm font-bold bg-muted px-2 py-1 rounded-md">₹{vendorData.commission_rate || 0} / admit</span></div>
+                      <div className="w-full h-px bg-border/60 my-2"></div>
+                      <div className="flex justify-between items-end"><span className="text-sm text-muted-foreground font-medium">Conversion Rate</span><span className="text-lg font-bold text-primary flex items-center"><Percent className="w-4 h-4 mr-0.5" />{conversionRate}%</span></div>
+                      <div className="w-full bg-muted rounded-full h-2.5 mt-2 overflow-hidden border border-border/40"><div className="bg-primary h-full rounded-full transition-all duration-1000 ease-out" style={{ width: `${Math.min(Number(conversionRate), 100)}%` }}></div></div>
+                    </div>
+                  </div>
+                  <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
+                    <h4 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wider text-muted-foreground">Vendor Link</h4>
+                    <div className="flex items-center gap-2 bg-muted/40 p-1.5 rounded-lg border border-border/60"><input type="text" readOnly value={`${window.location.origin}/enroll/${vendorData.referral_code}`} className="bg-transparent border-none outline-none text-xs w-full text-muted-foreground px-2 font-mono" /><Button size="sm" variant="outline" className="shrink-0 h-8" onClick={() => copyToClipboard(`${window.location.origin}/enroll/${vendorData.referral_code}`)}>Copy</Button></div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-card border border-border/60 rounded-xl shadow-sm overflow-hidden mt-6">
+                <div className="px-6 py-4 border-b border-border/60 bg-muted/10 flex justify-between items-center"><h4 className="font-semibold text-foreground">Referred Students List</h4><span className="text-xs font-bold bg-primary/10 text-primary px-3 py-1 rounded-full">{vendorStudents.length} Enrollments</span></div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted/30"><tr className="border-b border-border"><th className="text-left py-4 px-6 font-semibold text-foreground">Student Name</th><th className="text-left py-4 px-6 font-semibold text-foreground">Phone</th><th className="text-left py-4 px-6 font-semibold text-foreground">Class & Course</th><th className="text-left py-4 px-6 font-semibold text-foreground">Status</th><th className="text-left py-4 px-6 font-semibold text-foreground">Date</th></tr></thead>
+                    <tbody>
+                      {vendorStudents.length === 0 ? (
+                        <tr><td colSpan={5} className="py-12 text-center"><div className="flex flex-col items-center justify-center"><Users className="w-10 h-10 text-muted-foreground/30 mb-3" /><p className="text-muted-foreground font-medium">No students found</p><p className="text-sm text-muted-foreground/70">When this vendor refers students, they will appear here.</p></div></td></tr>
+                      ) : vendorStudents.map((student: any, idx: number) => (
+                        <tr key={idx} className="border-b border-border hover:bg-muted/50 transition-colors"><td className="py-4 px-6 text-foreground font-medium">{student.name}</td><td className="py-4 px-6 text-muted-foreground">{student.phone}</td><td className="py-4 px-6"><p className="text-foreground">{student.course?.title || 'Unknown'}</p><p className="text-xs text-muted-foreground mt-0.5">{student.class || '-'}</p></td><td className="py-4 px-6"><span className={`px-2 py-1 rounded-[6px] text-xs font-semibold ${student.status === 'APPROVED' ? 'bg-success/20 text-success' : 'bg-warning/20 text-warning'}`}>{student.status || 'PENDING'}</span></td><td className="py-4 px-6 text-muted-foreground">{new Date(student.created_at).toLocaleDateString()}</td></tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-8 w-full max-w-[1152px] mx-auto pb-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm"><h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 border-b border-border/60 pb-3"><UserCircle className="w-5 h-5 text-primary" /> Personal Details</h4><div className="space-y-3 text-sm"><div className="flex justify-between"><span className="text-muted-foreground">Vendor ID:</span> <span className="font-medium">{vendorData.vendor_id}</span></div><div className="flex justify-between"><span className="text-muted-foreground">Referral Code:</span> <span className="font-medium text-primary bg-primary/10 px-2 py-0.5 rounded">{vendorData.referral_code}</span></div><div className="flex justify-between"><span className="text-muted-foreground">Email:</span> <span className="font-medium">{vendorData.user?.email}</span></div><div className="flex justify-between"><span className="text-muted-foreground">Phone:</span> <span className="font-medium">{vendorData.user?.phone}</span></div><div className="flex justify-between"><span className="text-muted-foreground">Aadhaar No:</span> <span className="font-medium">{vendorData.aadhaar_number}</span></div><div className="flex justify-between"><span className="text-muted-foreground">PAN No:</span> <span className="font-medium">{vendorData.pan_number}</span></div></div></div>
+                <div className="space-y-6">
+                  <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
+                    <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 border-b border-border/60 pb-3"><Wallet className="w-5 h-5 text-success" /> Banking Details</h4>
+                    <div className="space-y-3 text-sm"><div className="flex justify-between"><span className="text-muted-foreground">Bank:</span> <span className="font-medium">{vendorData.bank_name}</span></div><div className="flex justify-between"><span className="text-muted-foreground">Branch:</span> <span className="font-medium">{vendorData.branch_name}</span></div><div className="flex justify-between"><span className="text-muted-foreground">Account No:</span> <span className="font-medium">{vendorData.account_number}</span></div><div className="flex justify-between"><span className="text-muted-foreground">IFSC:</span> <span className="font-medium">{vendorData.ifsc_code}</span></div><div className="flex justify-between items-center mt-2 pt-2 border-t border-border/40"><span className="text-muted-foreground">Commission Rate:</span>{isEditingCommission ? (<div className="flex items-center gap-2"><input type="number" value={editCommissionValue} onChange={(e) => setEditCommissionValue(e.target.value)} className="w-20 px-2 py-1 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-background text-foreground" /><Button size="sm" onClick={() => handleUpdateCommission(vendorData.id)}>Save</Button><Button size="sm" variant="outline" onClick={() => setIsEditingCommission(false)}>Cancel</Button></div>) : (<div className="flex items-center gap-2"><span className="font-bold text-success bg-success/10 px-2 py-1 rounded">₹{vendorData.commission_rate || 0} / admit</span><button onClick={() => { setEditCommissionValue(vendorData.commission_rate?.toString() || '0'); setIsEditingCommission(true); }} className="text-primary text-xs font-medium hover:underline">Edit</button></div>)}</div></div>
+                  </div>
+                  <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm"><h4 className="font-semibold text-foreground mb-4 flex items-center gap-2 border-b border-border/60 pb-3"><Copy className="w-5 h-5 text-warning" /> Address Details</h4><p className="text-sm text-foreground leading-relaxed">{vendorData.address},<br/>{vendorData.city}, {vendorData.state} - {vendorData.pincode}</p></div>
+                </div>
+              </div>
+              <div className="bg-warning/10 border border-warning/20 p-4 rounded-xl flex gap-3"><Settings className="w-5 h-5 text-warning shrink-0" /><p className="text-sm text-warning-foreground"><strong>Note about Passwords:</strong> For security reasons, vendor passwords are encrypted (hashed) in the database and cannot be viewed by anyone, including Super Admins. If a vendor loses their password, they must use the "Forgot Password" flow to reset it.</p></div>
+              <div className="bg-card border border-border/60 rounded-xl p-6 shadow-sm">
+                <h4 className="font-semibold text-foreground mb-6 flex items-center gap-2 border-b border-border/60 pb-3"><Eye className="w-5 h-5 text-primary" /> Uploaded Documents</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {vendorData.aadhaar_front && (<div className="border border-border/60 rounded-lg p-3 bg-muted/20 hover:bg-muted/40 transition-colors group cursor-pointer" onClick={() => setFullScreenImage(vendorData.aadhaar_front)}><p className="text-xs text-center mb-3 font-medium text-muted-foreground group-hover:text-primary transition-colors">Aadhaar (Front)</p><div className="aspect-[4/3] bg-black/5 rounded flex items-center justify-center overflow-hidden"><img src={vendorData.aadhaar_front} alt="Aadhaar Front" className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" /></div></div>)}
+                  {vendorData.aadhaar_back && (<div className="border border-border/60 rounded-lg p-3 bg-muted/20 hover:bg-muted/40 transition-colors group cursor-pointer" onClick={() => setFullScreenImage(vendorData.aadhaar_back)}><p className="text-xs text-center mb-3 font-medium text-muted-foreground group-hover:text-primary transition-colors">Aadhaar (Back)</p><div className="aspect-[4/3] bg-black/5 rounded flex items-center justify-center overflow-hidden"><img src={vendorData.aadhaar_back} alt="Aadhaar Back" className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" /></div></div>)}
+                  {vendorData.pan_image && (<div className="border border-border/60 rounded-lg p-3 bg-muted/20 hover:bg-muted/40 transition-colors group cursor-pointer" onClick={() => setFullScreenImage(vendorData.pan_image)}><p className="text-xs text-center mb-3 font-medium text-muted-foreground group-hover:text-primary transition-colors">PAN Card</p><div className="aspect-[4/3] bg-black/5 rounded flex items-center justify-center overflow-hidden"><img src={vendorData.pan_image} alt="PAN Card" className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" /></div></div>)}
+                  {vendorData.passbook_image && (<div className="border border-border/60 rounded-lg p-3 bg-muted/20 hover:bg-muted/40 transition-colors group cursor-pointer" onClick={() => setFullScreenImage(vendorData.passbook_image)}><p className="text-xs text-center mb-3 font-medium text-muted-foreground group-hover:text-primary transition-colors">Bank Passbook</p><div className="aspect-[4/3] bg-black/5 rounded flex items-center justify-center overflow-hidden"><img src={vendorData.passbook_image} alt="Passbook" className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" /></div></div>)}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <Dialog open={!!fullScreenImage} onOpenChange={(open) => !open && setFullScreenImage(null)}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader><DialogTitle>Document View</DialogTitle></DialogHeader>
+          <div className="mt-2 flex justify-center"><img src={fullScreenImage || ''} alt="Full Document View" className="max-w-full max-h-[75vh] object-contain rounded" /></div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
@@ -1508,6 +1321,7 @@ export default function SuperAdminDashboard() {
           <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/vendors" element={<VendorManagement />} />
+          <Route path="/vendors/:id" element={<VendorDetailsPage />} />
           <Route path="/students" element={<StudentManagement />} />
           <Route path="/students/:id" element={<StudentDetailsPage />} />
           <Route path="/courses" element={<CourseManagement />} />
