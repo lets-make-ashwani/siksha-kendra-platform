@@ -19,7 +19,7 @@ const loginSchema = z.object({
 const applicationSchema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
-  phone: z.string().min(10),
+  phone: z.string().regex(/^\d{10}$/, "Phone number must be exactly 10 digits"),
   address: z.string().min(5),
   city: z.string().min(2),
   state: z.string().min(2),

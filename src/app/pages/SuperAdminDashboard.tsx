@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate, useNavigate } from 'react-router';
 import { useState, useEffect } from 'react';
-import { Users, BookOpen, UserCheck, Bell, BarChart3, Settings, UserCircle, GraduationCap, CheckCircle, XCircle, Eye, LogOut, Calendar, Clock, IndianRupee, Wallet, Copy, Percent } from 'lucide-react';
+import { Users, BookOpen, UserCheck, Bell, BarChart3, Settings, UserCircle, GraduationCap, CheckCircle, XCircle, Eye, LogOut, Calendar, Clock, IndianRupee, Wallet, Copy, Percent, Download } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import Sidebar from '../components/Sidebar';
 import StatCard from '../components/StatCard';
@@ -587,7 +587,18 @@ const VendorManagement = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input label="Name" name="name" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} required />
             <Input label="Email" type="email" name="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} required />
-            <Input label="Phone" name="phone" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} required />
+            <Input 
+              label="Phone" 
+              name="phone" 
+              type="tel"
+              value={formData.phone} 
+              onChange={(e) => setFormData({...formData, phone: e.target.value.replace(/\D/g, '').slice(0, 10)})} 
+              required 
+              maxLength={10}
+              minLength={10}
+              pattern="\d{10}"
+              title="Phone number must be exactly 10 digits"
+            />
             <Input label="Address" name="address" value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})} required />
             <Input label="City" name="city" value={formData.city} onChange={(e) => setFormData({...formData, city: e.target.value})} required />
             <Input label="State" name="state" value={formData.state} onChange={(e) => setFormData({...formData, state: e.target.value})} required />
@@ -1065,10 +1076,46 @@ const StudentManagement = () => {
     }
   };
 
+  const exportToCSV = () => {
+    if (students.length === 0) {
+      toast.error('No data to export');
+      return;
+    }
+
+    const headers = ['Enrollment ID', 'Student Name', 'Email', 'Phone', 'Class', 'Course', 'Vendor', 'Status', 'Enrolled Date'];
+    
+    const csvRows = students.map(student => {
+      return [
+        student.enrollment_id || 'N/A',
+        `"${student.name || ''}"`,
+        `"${student.email || ''}"`,
+        `"${student.phone || ''}"`,
+        `"${student.class || ''}"`,
+        `"${student.course?.title || 'Unknown Course'}"`,
+        `"${student.vendor?.user?.name || 'Direct Enrollment'}"`,
+        `"${student.status || 'PENDING'}"`,
+        `"${new Date(student.created_at).toLocaleDateString()}"`
+      ].join(',');
+    });
+
+    const csvContent = [headers.join(','), ...csvRows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `student_leads_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
   <div className="p-6">
-    <div className="mb-6">
+    <div className="mb-6 flex items-center justify-between">
       <h1 className="text-3xl font-bold text-foreground">Student Management</h1>
+      <Button onClick={exportToCSV} variant="outline" className="flex items-center gap-2">
+        <Download className="w-4 h-4" /> Export CSV
+      </Button>
     </div>
 
     <Card>

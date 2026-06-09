@@ -17,6 +17,7 @@ export default function StudentRegistration() {
     email: '',
     mobile: '',
     address: '',
+    board: '',
     class: '',
     schoolName: '',
     parentName: '',
@@ -54,6 +55,7 @@ export default function StudentRegistration() {
         email: formData.email,
         phone: formData.mobile,
         address: formData.address,
+        board: formData.board,
         class: formData.class,
         school_name: formData.schoolName,
         parent_name: formData.parentName,
@@ -92,6 +94,9 @@ export default function StudentRegistration() {
       // Allow only numeric input and limit to 10 digits
       const numericValue = value.replace(/\D/g, '');
       setFormData(prev => ({ ...prev, [name]: numericValue.slice(0, 10) }));
+    } else if (name === 'board') {
+      // If they change their board, reset their selected class and course to enforce the correct order
+      setFormData(prev => ({ ...prev, [name]: value, class: '', course: '' }));
     } else if (name === 'class') {
       // If they change their class, reset their selected course to avoid mismatches
       setFormData(prev => ({ ...prev, [name]: value, course: '' }));
@@ -177,6 +182,30 @@ export default function StudentRegistration() {
                   pattern="\d{10}"
                   title="Mobile number must be exactly 10 digits"
                 />
+            <Input
+              label="School Name"
+              name="schoolName"
+              value={formData.schoolName}
+              onChange={handleChange}
+              required
+              placeholder="Enter your school name"
+            />
+            <div>
+              <label className="block mb-2 text-foreground">Board</label>
+              <select
+                name="board"
+                value={formData.board}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 bg-input-background border border-input rounded-[12px] text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              >
+                <option value="">Select Board</option>
+                <option value="CBSE">CBSE</option>
+                <option value="ICSE">ICSE</option>
+                <option value="State Board">State Board</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
                 <div>
                   <label className="block mb-2 text-foreground">Class</label>
                   <select
@@ -184,9 +213,10 @@ export default function StudentRegistration() {
                     value={formData.class}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 bg-input-background border border-input rounded-[12px] text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                disabled={!formData.board}
+                className={`w-full px-4 py-3 bg-input-background border border-input rounded-[12px] text-foreground focus:outline-none focus:ring-2 focus:ring-ring ${!formData.board ? 'opacity-50 cursor-not-allowed bg-muted' : ''}`}
                   >
-                    <option value="">Select Class</option>
+                <option value="">{formData.board ? 'Select Class' : 'Select Board First'}</option>
                     <option value="Class 9">Class 9</option>
                     <option value="Class 10">Class 10</option>
                     <option value="Class 11">Class 11</option>
@@ -207,16 +237,6 @@ export default function StudentRegistration() {
               />
             </div>
 
-            <div>
-              <Input
-                label="School Name"
-                name="schoolName"
-                value={formData.schoolName}
-                onChange={handleChange}
-                required
-                placeholder="Enter your school name"
-              />
-            </div>
 
             <div>
               <h3 className="text-lg font-semibold text-foreground mb-4">Parent/Guardian Information</h3>
