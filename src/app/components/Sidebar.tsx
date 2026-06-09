@@ -16,8 +16,8 @@ export default function Sidebar({ items, basePath }: SidebarProps) {
   const location = useLocation();
 
   return (
-    <aside className="w-64 bg-sidebar border-r border-sidebar-border min-h-screen sticky top-0">
-      <div className="p-6">
+    <aside className="w-64 bg-sidebar border-r border-sidebar-border h-[calc(100vh-77px)] sticky top-[77px] flex flex-col shrink-0 z-40">
+      <div className="px-4 py-6 flex-1 overflow-y-auto">
         {items.map((item) => {
           const Icon = item.icon;
           const isActive = location.pathname === `${basePath}${item.path}`;

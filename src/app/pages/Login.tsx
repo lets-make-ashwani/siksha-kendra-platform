@@ -4,6 +4,7 @@ import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import Card from '../components/Card';
+import { Logo } from '../components/Logo';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -57,11 +58,8 @@ export default function Login() {
     <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-primary-light via-background to-accent flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <img src="/TKS.png" alt="Topper's Siksha Kendra Logo" className="w-14 h-14 object-contain" />
-            <span className="text-3xl font-bold text-foreground">
-              Topper<span className="text-primary">'s</span> Siksha <span className="text-primary">Kendra</span>
-            </span>
+          <div className="flex justify-center mb-6">
+            <Logo />
           </div>
           <h1 className="text-2xl font-bold text-foreground mb-2">Welcome Back!</h1>
           <p className="text-muted-foreground">Sign in to continue your learning journey</p>

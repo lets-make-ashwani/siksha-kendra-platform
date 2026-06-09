@@ -53,7 +53,20 @@ export const login = async (req: Request, res: Response): Promise<any> => {
       return res.json({ token, user: { id: 'super_admin_env', name: 'Super Admin', email: superAdminEmail, role: 'SUPER_ADMIN' } });
     }
 
-    // 2. Standard Vendor Database Login
+    // 2. Dummy Vendor Environment Variable Login (Bypasses Database for local testing)
+    const dummyVendorEmail = process.env.DUMMY_VENDOR_EMAIL;
+    const dummyVendorPassword = process.env.DUMMY_VENDOR_PASSWORD;
+    
+    if (dummyVendorEmail && email === dummyVendorEmail && password === dummyVendorPassword) {
+      const token = jwt.sign(
+        { id: 'dummy_vendor_env', role: 'VENDOR', vendorId: 'dummy_vendor_id_123' },
+        process.env.JWT_SECRET as string,
+        { expiresIn: process.env.JWT_EXPIRES_IN || '1d' }
+      );
+      return res.json({ token, user: { id: 'dummy_vendor_env', name: 'Test Vendor', email: dummyVendorEmail, role: 'VENDOR', phone: '9999999999' } });
+    }
+
+    // 3. Standard Vendor Database Login
     const user = await prisma.user.findUnique({ where: { email }, include: { vendor: true } });
     if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ message: 'Invalid credentials' });

@@ -3,7 +3,7 @@ import { CheckCircle, Clock, Upload } from 'lucide-react';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import Card from '../components/Card';
-import Header from '../components/Header';
+import { Logo } from '../components/Logo';
 
 export default function VendorRegistration() {
   const [submitted, setSubmitted] = useState(false);
@@ -73,16 +73,14 @@ export default function VendorRegistration() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen flex flex-col bg-background">
-        <Header />
-        <div className="flex-1 bg-gradient-to-br from-primary-light to-accent flex items-center justify-center p-4">
-          <Card className="max-w-md w-full text-center">
+      <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-primary-light to-accent flex items-center justify-center p-4">
+        <Card className="max-w-md w-full text-center">
           <div className="w-20 h-20 bg-warning rounded-full flex items-center justify-center mx-auto mb-6">
             <Clock className="w-12 h-12 text-warning-foreground" />
           </div>
           <h1 className="text-3xl font-bold text-foreground mb-4">Application Submitted!</h1>
           <p className="text-muted-foreground mb-6">
-            Thank you for your interest in becoming a Topper's Shiksha Kendra vendor. Your application is currently under review.
+            Thank you for your interest in becoming a Topper's Siksha Kendra vendor. Your application is currently under review.
           </p>
           <div className="bg-primary-light p-6 rounded-[12px] mb-6">
             <h3 className="font-semibold text-foreground mb-3">What's Next?</h3>
@@ -101,20 +99,20 @@ export default function VendorRegistration() {
               </li>
             </ul>
           </div>
-          </Card>
-        </div>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <Header />
-      <div className="flex-1 bg-gradient-to-br from-primary-light to-accent py-12">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-primary-light to-accent py-12">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
+          <div className="flex justify-center mb-6">
+            <Logo />
+          </div>
           <h1 className="text-4xl font-bold text-foreground mb-3">
-            Become a Topper<span className="text-primary">'s</span> Shiksha <span className="text-primary">Kendra</span> Vendor
+            Become a Topper<span className="text-primary">'s</span> Siksha <span className="text-primary">Kendra</span> Vendor
           </h1>
           <p className="text-lg text-muted-foreground">Join our network of trusted educational partners</p>
         </div>
@@ -417,7 +415,6 @@ export default function VendorRegistration() {
         <p className="text-center text-sm text-muted-foreground mt-6">
           By submitting this application, you agree to our Vendor Terms of Service and Privacy Policy
         </p>
-        </div>
       </div>
     </div>
   );

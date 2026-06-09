@@ -2,6 +2,7 @@ import { Link } from 'react-router';
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import Button from './Button';
+import { Logo } from './Logo';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,15 +10,10 @@ export default function Navbar() {
   const role = localStorage.getItem('role');
 
   return (
-    <nav className="bg-card border-b border-border sticky top-0 z-50 shadow-sm">
+    <nav className="bg-card border-b border-border sticky top-0 z-50 shadow-sm shrink-0">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <Link to="/" className="flex items-center gap-2">
-            <img src="/TKS.png" alt="Topper's Siksha Kendra Logo" className="w-10 h-10 object-contain" />
-            <span className="text-xl font-bold text-foreground">
-              Topper<span className="text-primary">'s</span> Siksha <span className="text-primary">Kendra</span>
-            </span>
-          </Link>
+        <div className="flex justify-between items-center h-[76px]">
+          <Logo />
 
           <div className="hidden md:flex items-center gap-6">
             {token ? (

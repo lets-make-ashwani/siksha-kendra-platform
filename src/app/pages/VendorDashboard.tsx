@@ -154,12 +154,12 @@ const Dashboard = () => {
   };
 
   const shareOnWhatsApp = () => {
-    const message = encodeURIComponent(`Join Topper's Shiksha Kendra through my referral link: ${referralLink}`);
+    const message = encodeURIComponent(`Join Topper's Siksha Kendra through my referral link: ${referralLink}`);
     window.open(`https://wa.me/?text=${message}`, '_blank');
   };
 
   const shareOnTelegram = () => {
-    const message = encodeURIComponent(`Join Topper's Shiksha Kendra through my referral link: ${referralLink}`);
+    const message = encodeURIComponent(`Join Topper's Siksha Kendra through my referral link: ${referralLink}`);
     window.open(`https://t.me/share/url?url=${referralLink}&text=${message}`, '_blank');
   };
 
@@ -505,7 +505,7 @@ const Logout = () => {
 
 export default function VendorDashboard() {
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] bg-background">
+    <div className="flex min-h-[calc(100vh-77px)] bg-background">
       <Sidebar items={sidebarItems} basePath="/vendor" />
       <main className="flex-1">
         <Routes>

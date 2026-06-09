@@ -4,7 +4,7 @@ import { CheckCircle } from 'lucide-react';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import Card from '../components/Card';
-import Header from '../components/Header';
+import { Logo } from '../components/Logo';
 import { Skeleton } from '../components/ui/skeleton';
 
 export default function StudentRegistration() {
@@ -116,30 +116,28 @@ export default function StudentRegistration() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen flex flex-col bg-background">
-        <Header />
-        <div className="flex-1 bg-gradient-to-br from-primary-light to-accent flex items-center justify-center p-4">
-          <Card className="max-w-md w-full text-center">
+      <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-primary-light to-accent flex items-center justify-center p-4">
+        <Card className="max-w-md w-full text-center">
           <div className="w-20 h-20 bg-success rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle className="w-12 h-12 text-success-foreground" />
           </div>
           <h1 className="text-3xl font-bold text-foreground mb-4">Registration Successful!</h1>
           <p className="text-muted-foreground mb-6">
-            Thank you for registering with Topper's Shiksha Kendra. We have received your application and will contact you shortly.
+            Thank you for registering with Topper's Siksha Kendra. We have received your application and will contact you shortly.
           </p>
           <Button onClick={() => window.location.href = '/'}>Back to Home</Button>
-          </Card>
-        </div>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <Header />
-      <div className="flex-1 bg-gradient-to-br from-primary-light to-accent py-12">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-primary-light to-accent py-12">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
+          <div className="flex justify-center mb-6">
+            <Logo />
+          </div>
           <h1 className="text-4xl font-bold text-foreground mb-3">Student Registration</h1>
           <p className="text-lg text-muted-foreground">Join thousands of students on their learning journey</p>
         </div>
@@ -301,7 +299,6 @@ export default function StudentRegistration() {
         <p className="text-center text-sm text-muted-foreground mt-6">
           By submitting this form, you agree to our Terms of Service and Privacy Policy
         </p>
-        </div>
       </div>
     </div>
   );
